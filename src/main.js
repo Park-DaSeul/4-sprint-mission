@@ -21,7 +21,7 @@ import { Product, ElectronicProduct, Article } from './classes/class.js'; //클�
 async function main() {
   try {
     const newProducts = await createProductInstances(); //ProductInstance.js 파일로 연결
-    console.log('최종 제품 인스턴스 생성 완료'); // , newProducts 넣어주면 인스턴스 한번더 출력
+    console.log('성공적으로 인스턴스화된 제품 목록:', newProducts);
   } catch (error) {
     console.error('메인 실행 중 오류 발생:', error);
   }

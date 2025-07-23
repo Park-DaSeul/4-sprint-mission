@@ -19,22 +19,14 @@ export function getArticleList(params = {}) {
   Object.keys(params).forEach((key) =>
     url.searchParams.append(key, params[key]),
   );
-  return fetch(url)
-    .then((res) => handleResponse2(res)) // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
-    .catch((error) => {
-      console.error('게시물 불러오기 실패', error);
-      throw error; //오류를 다시 던져 상위 호출자에게 알립니다.
-    });
+  return fetch(url).then((res) => handleResponse2(res)); // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
 }
 
 //특정 ID를 가진 단일 게시글 정보를 가져오는 함수입니다.
 export function getArticle(id) {
-  return fetch(`${BASE_URL}/articles/${id}`)
-    .then((res) => handleResponse2(res)) // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
-    .catch((error) => {
-      console.error(`ID ${id}의 게시물 불러오기 실패`, error);
-      throw error; //오류를 다시 던져 상위 호출자에게 알립니다.
-    });
+  return fetch(`${BASE_URL}/articles/${id}`).then((res) =>
+    handleResponse2(res),
+  ); // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
 }
 //새로운 게시글을 생성하는 함수입니다.
 export function createArticle(articleData) {
@@ -46,12 +38,7 @@ export function createArticle(articleData) {
       // 요청 본문이 JSON 형식임을 서버에 알립니다.
       'Content-type': 'application/json',
     },
-  })
-    .then((res) => handleResponse2(res)) // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
-    .catch((error) => {
-      console.error('게시물 생성중 오류', error);
-      throw error;
-    });
+  }).then((res) => handleResponse2(res)); // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
 }
 
 //특정 ID를 가진 게시글의 일부 정보를 업데이트하는 함수입니다.
@@ -63,23 +50,12 @@ export function patchArticle(id, articleData) {
       // 요청 본문이 JSON 형식임을 서버에 알립니다.
       'Content-type': 'application/json',
     },
-  })
-    .then((res) => handleResponse2(res)) // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
-    .catch((error) => {
-      console.error(`ID ${id}의 게시물 수정 실패`, error);
-      s;
-      throw error;
-    });
+  }).then((res) => handleResponse2(res)); // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
 }
 
 //특정 ID를 가진 게시글을 삭제하는 함수입니다.
 export function deleteArticle(id) {
   return fetch(`${BASE_URL}/articles/${id}`, {
     method: 'DELETE', // HTTP DELETE 메서드를 사용합니다.
-  })
-    .then((res) => handleResponse2(res)) // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
-    .catch((error) => {
-      console.error(`ID ${id}의 게시물 삭제 실패`, error);
-      throw error;
-    });
+  }).then((res) => handleResponse2(res)); // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
 }
