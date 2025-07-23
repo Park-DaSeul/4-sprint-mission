@@ -13,10 +13,6 @@ export async function createProductInstances(params = {}) {
 
     const rawProductList = rawApiResponse.list; //  .list 중요! list안에 배열이 있음
 
-    // if (!Array.isArray(rawProductList)) {  //rawProductList가 배열인지 확인
-    //     throw new Error("API 응답이 예상된 상품 목록 배열 형식이 아닙니다.");
-    // }
-
     // 가져온 각 상품 데이터를 순회하며 인스턴스를 생성합니다.
     for (const rawProduct of rawProductList) {
       // tags 배열이 존재하고, 배열이며, "전자제품"을 포함하는지 확인합니다.

@@ -15,11 +15,9 @@ export async function handleResponse1(res) {
 //제품 목록을 가져오는 함수입니다. 선택적으로 쿼리 파라미터를 받아 필터링할 수 있습니다.
 export async function getProductList(params = {}) {
   const url = new URL(`${BASE_URL}/products`);
-  Object.keys(params).forEach(
-    (
-      key, //Object.keys(params)가 배열을 만들어줌
-    ) => url.searchParams.append(key, params[key]), //URL에 쿼리를 연결해줌
-  );
+  Object.keys(params).forEach((key) =>
+    url.searchParams.append(key, params[key]),
+  ); //Object.keys(params)가 배열을 만들어줌, URL에 쿼리를 연결해줌
 
   const res = await fetch(url); //실제로 용청을 보내는 역할
   return handleResponse1(res); // 응답을 handleResponse 함수로 넘겨 오류 처리 및 JSON 파싱을 합니다.
