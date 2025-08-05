@@ -17,11 +17,11 @@ Content-Type: application/json
 
 ### 4. 특정 상품 상세 조회 (GET /products/:id) - ID는 생성 후 확인
 # 아래 ID는 예시입니다. 실제 생성된 상품의 ID로 변경해야 합니다.
-GET http://localhost:3000/products/53a068c9-11b7-421e-9266-11ec9254f68a
+GET http://localhost:3000/products/329cb45d-d91b-437a-a130-6e091f6e0096
 
 ### 5. 특정 상품 정보 수정 (PATCH /products/:id) - ID는 생성 후 확인
 # 아래 ID는 예시입니다. 실제 생성된 상품의 ID로 변경해야 합니다.
-PATCH http://localhost:3000/products/53a068c9-11b7-421e-9266-11ec9254f68a
+PATCH http://localhost:3000/products/329cb45d-d91b-437a-a130-6e091f6e0096
 Content-Type: application/json
 
 {
@@ -31,4 +31,36 @@ Content-Type: application/json
 
 ### 6. 특정 상품 삭제 (DELETE /products/:id) - ID는 생성 후 확인
 # 아래 ID는 예시입니다. 실제 생성된 상품의 ID로 변경해야 합니다.
-DELETE http://localhost:3000/products/53a068c9-11b7-421e-9266-11ec9254f68a
+DELETE http://localhost:3000/products/329cb45d-d91b-437a-a130-6e091f6e0096
+
+
+### 모든 Article 조회
+GET http://localhost:3000/articles
+
+### 2. 특정 조건으로 상품 조회 (GET /articles?offset=0&limit=5&order=recent)
+GET http://localhost:3000/articles?offset=0&limit=5&order=recent
+
+### 새 Article 생성
+POST http://localhost:3000/articles
+Content-Type: application/json
+
+{
+  "title": "첫 번째 기사 제목",
+  "content": "이것은 첫 번째 기사의 내용입니다. 아주 흥미로운 내용이죠."
+}
+
+### 특정 Article 조회 (ID 입력 필요)
+GET http://localhost:3000/articles/0dcc73d7-d4ec-44cb-a403-87f56b7eb7b8
+
+
+### Article 업데이트 (ID 입력 필요)
+PATCH http://localhost:3000/articles/0dcc73d7-d4ec-44cb-a403-87f56b7eb7b8
+Content-Type: application/json
+
+{
+  "title": "업데이트된 기사 제목",
+  "content": "내용도 새롭게 변경되었습니다."
+}
+
+### Article 삭제 (ID 입력 필요)
+DELETE http://localhost:3000/articles/0dcc73d7-d4ec-44cb-a403-87f56b7eb7b8
