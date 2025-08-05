@@ -1,6 +1,7 @@
 import express, { Router } from 'express';
 import { PrismaClient, Prisma } from '@prisma/client';
 import asyncHandler from '../utils/asyncHandler.js';
+import commentsRouter from './comments/productComments.js';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -83,5 +84,7 @@ router
       res.sendStatus(204);
     }),
   );
+
+router.use('/:productId/comments', commentsRouter);
 
 export default router;
