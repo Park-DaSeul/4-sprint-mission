@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { z } from 'zod';
 //에러 핸들러 입니다.
 function asyncHandler(handler) {
   return async function (req, res, next) {
@@ -6,13 +7,15 @@ function asyncHandler(handler) {
       await handler(req, res, next);
     } catch (e) {
       console.error('AsyncHandler caught an error:', e);
-      if (
-        e.name === 'StructError' ||
-        e instanceof Prisma.PrismaClientValidationError //유효성 검사 에러 유형에 속하는지
-      ) {
-        return res
-          .status(400)
-          .json({ message: e.message || '잘못 요청된 데이터입니다.' });
+      //zod 유효성 검사 오류 처리
+      if (e instanceof z.ZodError) {
+        return res.status(400).json({
+          message: '유효성 검사 오류',
+          errors: e.errors.map((err) => ({
+            path: err.path.join('.'),
+            message: err.message,
+          })),
+        });
       } else if (
         e instanceof Prisma.PrismaClientKnownRequestError && //예측 가능한 에러인지 확인
         e.code === 'P2025'

@@ -2,6 +2,11 @@ import express, { Router } from 'express';
 import { PrismaClient, Prisma } from '@prisma/client';
 import asyncHandler from '../../utils/asyncHandler.js';
 import commentsRouter from './productComments.js';
+import {
+  createProductSchema,
+  updateProductSchema,
+  productIdSchema,
+} from '../../schemas/products/productSchema.js';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -11,6 +16,7 @@ router
   .get(
     asyncHandler(async (req, res) => {
       const { offset = 0, limit = 10, order = 'recent' } = req.query;
+      //offset 방식의 페이지 네이션
       let orderBy;
       switch (order) {
         case 'old':
@@ -30,14 +36,9 @@ router
   )
   .post(
     asyncHandler(async (req, res) => {
-      const { name, description, price, tags } = req.body;
+      const newData = createProductSchema.parse(req.body); //유효성 검사
       const product = await prisma.product.create({
-        data: {
-          name,
-          description,
-          price,
-          tags: tags || [],
-        },
+        data: newData,
       });
       res.status(201).json(product);
     }),
@@ -47,7 +48,7 @@ router
   .route('/:id')
   .get(
     asyncHandler(async (req, res) => {
-      const { id } = req.params;
+      const { id } = productIdSchema.parse(req.params); //유효성 검사
       const product = await prisma.product.findUniqueOrThrow({
         where: { id },
       });
@@ -56,13 +57,8 @@ router
   )
   .patch(
     asyncHandler(async (req, res) => {
-      const { id } = req.params;
-      const { name, description, price, tags } = req.body;
-      const updateData = {};
-      if (name !== undefined) updateData.name = name;
-      if (description !== undefined) updateData.description = description;
-      if (price !== undefined) updateData.price = price;
-      if (tags !== undefined) updateData.tags = tags;
+      const { id } = productIdSchema.parse(req.params); //유효성 검사
+      const updateData = updateProductSchema.parse(req.body); //유효성 검사
 
       if (Object.keys(updateData).length === 0) {
         return res.status(400).json({ message: '업데이트할 내용이 없습니다.' });
@@ -77,7 +73,7 @@ router
   )
   .delete(
     asyncHandler(async (req, res) => {
-      const { id } = req.params;
+      const { id } = productIdSchema.parse(req.params); //유효성 검사
       await prisma.product.delete({
         where: { id },
       });
