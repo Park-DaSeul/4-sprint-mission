@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import express from 'express';
-import productsRouter from './routes/products.js';
-import articlesRouter from './routes/articles.js';
+import productsRouter from './routes/products/products.js';
+import articlesRouter from './routes/articles/articles.js';
 
 dotenv.config();
 

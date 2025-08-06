@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import { PrismaClient, Prisma } from '@prisma/client';
-import asyncHandler from '../utils/asyncHandler.js';
-import commentsRouter from './comments/articleComments.js';
+import asyncHandler from '../../utils/asyncHandler.js';
+import commentsRouter from './productComments.js';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -20,24 +20,26 @@ router
         default:
           orderBy = { createdAt: 'desc' };
       }
-      const articles = await prisma.article.findMany({
+      const products = await prisma.product.findMany({
         orderBy,
         skip: parseInt(offset),
         take: parseInt(limit),
       });
-      res.json(articles);
+      res.json(products);
     }),
   )
   .post(
     asyncHandler(async (req, res) => {
-      const { title, content } = req.body;
-      const article = await prisma.article.create({
+      const { name, description, price, tags } = req.body;
+      const product = await prisma.product.create({
         data: {
-          title,
-          content,
+          name,
+          description,
+          price,
+          tags: tags || [],
         },
       });
-      res.status(201).json(article);
+      res.status(201).json(product);
     }),
   );
 
@@ -46,41 +48,43 @@ router
   .get(
     asyncHandler(async (req, res) => {
       const { id } = req.params;
-      const article = await prisma.article.findUniqueOrThrow({
+      const product = await prisma.product.findUniqueOrThrow({
         where: { id },
       });
-      res.json(article);
+      res.json(product);
     }),
   )
   .patch(
     asyncHandler(async (req, res) => {
       const { id } = req.params;
-      const { title, content } = req.body;
+      const { name, description, price, tags } = req.body;
       const updateData = {};
-      if (title !== undefined) updateData.title = title;
-      if (content !== undefined) updateData.content = content;
+      if (name !== undefined) updateData.name = name;
+      if (description !== undefined) updateData.description = description;
+      if (price !== undefined) updateData.price = price;
+      if (tags !== undefined) updateData.tags = tags;
 
       if (Object.keys(updateData).length === 0) {
         return res.status(400).json({ message: '업데이트할 내용이 없습니다.' });
       }
 
-      const article = await prisma.article.update({
+      const product = await prisma.product.update({
         where: { id },
         data: updateData,
       });
-      res.json(article);
+      res.json(product);
     }),
   )
   .delete(
     asyncHandler(async (req, res) => {
       const { id } = req.params;
-      await prisma.article.delete({
+      await prisma.product.delete({
         where: { id },
       });
       res.sendStatus(204);
     }),
   );
 
-router.use('/:articleId/comments', commentsRouter);
+router.use('/:productId/comments', commentsRouter);
 
 export default router;
