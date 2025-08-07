@@ -26,7 +26,21 @@ router
         default:
           orderBy = { createdAt: 'desc' };
       }
+      //검색 기능 추가
+      const searchKeyword = req.query.search;
+      let where = {};
+
+      if (searchKeyword) {
+        where = {
+          OR: [
+            { title: { contains: searchKeyword, mode: 'insensitive' } },
+            { content: { contains: searchKeyword, mode: 'insensitive' } },
+          ],
+        };
+      }
+
       const articles = await prisma.article.findMany({
+        where,
         orderBy,
         skip: parseInt(offset),
         take: parseInt(limit),

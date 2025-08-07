@@ -4,6 +4,10 @@ GET http://localhost:3000/products
 ### 2. 특정 조건으로 상품 조회 (GET /products?offset=0&limit=5&order=recent)
 GET http://localhost:3000/products?offset=0&limit=5&order=recent
 
+### 2-1. 특정 조건으로 상품 조회 (GET /products?search=고급)
+GET http://localhost:3000/products?search=고급
+
+
 ### 3. 새로운 상품 생성 (POST /products)
 POST http://localhost:3000/products
 Content-Type: application/json
@@ -41,12 +45,15 @@ GET http://localhost:3000/articles
 ### 2. 특정 조건으로 상품 조회 (GET /articles?offset=0&limit=5&order=recent)
 GET http://localhost:3000/articles?offset=0&limit=5&order=recent
 
+### 2-1. 특정 조건으로 상품 조회 (GET /articles?search=고급)
+GET http://localhost:3000/articles?search=고급
+
 ### 새 Article 생성
 POST http://localhost:3000/articles
 Content-Type: application/json
 
 {
-  "title": "첫 번째 기사 제목",
+  "title": "첫 번째 미션 제목",
   "content": "이것은 첫 번째 기사의 내용입니다. 아주 흥미로운 내용이죠."
 }
 
