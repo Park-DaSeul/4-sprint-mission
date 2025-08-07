@@ -23,3 +23,8 @@ export const updateProductSchema = createProductSchema.partial();
 export const productIdSchema = z.object({
   id: z.uuid({ message: '유효하지 않은 상품 ID 형식입니다.' }),
 });
+
+// productId를 사용하기 위한 스키마
+export const productParamSchema = z.object({
+  productId: z.uuid({ message: '유효하지 않은 상품 ID 형식입니다.' }),
+});

@@ -6,7 +6,7 @@ import {
   updateArticleCommentSchema,
   articleCommentParamsSchema,
 } from '../../schemas/articles/articleCommentSchema.js';
-import { articleIdSchema } from '../../schemas/articles/articleSchema.js';
+import { articleParamSchema } from '../../schemas/articles/articleSchema.js';
 
 const prisma = new PrismaClient();
 const router = express.Router({ mergeParams: true });
@@ -15,7 +15,7 @@ router
   .route('/')
   .get(
     asyncHandler(async (req, res) => {
-      const { articleId } = articleIdSchema.parse(req.params); //유효성 검사
+      const { articleId } = articleParamSchema.parse(req.params); //유효성 검사
       const { cursor, take = 10 } = req.query;
       //coursor 방식의 페이지 네이션
       const findManyArgs = {
@@ -43,7 +43,7 @@ router
   )
   .post(
     asyncHandler(async (req, res) => {
-      const { articleId } = articleIdSchema.parse(req.params); //유효성 검사
+      const { articleId } = articleParamSchema.parse(req.params); //유효성 검사
       const newData = createArticleCommentSchema.parse(req.body); //유효성 검사
       const comment = await prisma.articleComment.create({
         data: {

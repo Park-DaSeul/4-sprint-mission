@@ -6,7 +6,7 @@ import {
   updateProductCommentSchema,
   productCommentParamsSchema,
 } from '../../schemas/products/productCommentSchema.js';
-import { productIdSchema } from '../../schemas/products/productSchema.js';
+import { productParamSchema } from '../../schemas/products/productSchema.js';
 
 const prisma = new PrismaClient();
 const router = express.Router({ mergeParams: true });
@@ -15,7 +15,7 @@ router
   .route('/')
   .get(
     asyncHandler(async (req, res) => {
-      const { productId } = productIdSchema.parse(req.params); //유효성 검사
+      const { productId } = productParamSchema.parse(req.params); //유효성 검사
       const { cursor, take = 10 } = req.query;
       //coursor 방식의 페이지 네이션
       const findManyArgs = {
@@ -43,7 +43,7 @@ router
   )
   .post(
     asyncHandler(async (req, res) => {
-      const { productId } = productIdSchema.parse(req.params); //유효성 검사
+      const { productId } = productParamSchema.parse(req.params); //유효성 검사
       const newData = createProductCommentSchema.parse(req.body); //유효성 검사
       const comment = await prisma.productComment.create({
         data: {

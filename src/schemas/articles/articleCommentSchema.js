@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { articleIdSchema } from './articleSchema.js';
+import { articleParamSchema } from './articleSchema.js';
 
 export const createArticleCommentSchema = z.object({
   content: z
@@ -15,6 +15,6 @@ export const commentIdSchema = z.object({
 });
 
 export const articleCommentParamsSchema = z.intersection(
-  articleIdSchema,
+  articleParamSchema,
   commentIdSchema,
 );

@@ -19,7 +19,7 @@ Content-Type: application/json
 GET http://localhost:3000/products/82c3b880-8f04-45f3-886c-a25f1749a7f0
 
 ### 5. 특정 상품 정보 수정 (PATCH /products/:id) - ID는 생성 후 확인
-PATCH http://localhost:3000/products/82c3b880-8f04-45f3-886c-a25f1749a7f0
+PATCH http://localhost:3000/products/0cb0339e-e715-42f0-8716-8ad09fefa726
 Content-Type: application/json
 
 {
@@ -29,7 +29,10 @@ Content-Type: application/json
 
 ### 6. 특정 상품 삭제 (DELETE /products/:id) - ID는 생성 후 확인
 # 아래 ID는 예시입니다. 실제 생성된 상품의 ID로 변경해야 합니다.
-DELETE http://localhost:3000/products/82c3b880-8f04-45f3-886c-a25f1749a7f0
+DELETE http://localhost:3000/products/dc7e9166-f8a5-4b5f-92b6-fcc4a64fced3
+
+
+
 
 
 ### 모든 Article 조회
@@ -52,7 +55,7 @@ GET http://localhost:3000/articles/0dcc73d7-d4ec-44cb-a403-87f56b7eb7b8
 
 
 ### Article 업데이트 (ID 입력 필요)
-PATCH http://localhost:3000/articles/0dcc73d7-d4ec-44cb-a403-87f56b7eb7b8
+PATCH http://localhost:3000/articles/1da8015c-cf35-4ebf-9e02-98ec123e5d1e
 Content-Type: application/json
 
 {
@@ -65,16 +68,19 @@ DELETE http://localhost:3000/articles/0dcc73d7-d4ec-44cb-a403-87f56b7eb7b8
 
 
 
+
+
+
 ### 첫 번째 페이지 Product Comment 조회 (Product ID 입력 필요)
 # 예시: GET {{baseUrl}}/products/YOUR_PRODUCT_ID/comments?take=5
-GET http://localhost:3000/products/82c3b880-8f04-45f3-886c-a25f1749a7f0/comments?take=5
+GET http://localhost:3000/products/1ca83f99-521c-4361-941d-adb4fe9154c3/comments?take=5
 
 ### 다음 페이지 Product Comment 조회 (Product ID와 이전 응답의 nextCursor 값 입력 필요)
 # 예시: GET {{baseUrl}}/products/YOUR_PRODUCT_ID/comments?take=5&cursor=NEXT_CURSOR_VALUE
-GET http://localhost:3000/products/82c3b880-8f04-45f3-886c-a25f1749a7f0/comments?take=5&cursor=99710df0-16bc-40f2-af0e-0aaa3483ba02
+GET http://localhost:3000/products/1ca83f99-521c-4361-941d-adb4fe9154c3/comments?take=5&cursor=99710df0-16bc-40f2-af0e-0aaa3483ba02
 
 ### 새 Product Comment 생성 (Product ID 입력 필요)
-POST http://localhost:3000/products/82c3b880-8f04-45f3-886c-a25f1749a7f0/comments
+POST http://localhost:3000/products/1ca83f99-521c-4361-941d-adb4fe9154c3/comments
 Content-Type: application/json
 
 {
@@ -82,15 +88,50 @@ Content-Type: application/json
 }
 
 ### 특정 Product Comment 조회 (Product ID, Comment ID 입력 필요)
-GET http://localhost:3000/products/82c3b880-8f04-45f3-886c-a25f1749a7f0/comments/d85b6c16-3af8-4b7a-862d-93b5df446a0f
+GET http://localhost:3000/products/1ca83f99-521c-4361-941d-adb4fe9154c3/comments/f2b2349d-ade8-462f-ba80-c574e93e0206
 
 ### Product Comment 업데이트 (Product ID, Comment ID 입력 필요)
-PATCH http://localhost:3000/products/82c3b880-8f04-45f3-886c-a25f1749a7f0/comments/d85b6c16-3af8-4b7a-862d-93b5df446a0f
+PATCH http://localhost:3000/products/1ca83f99-521c-4361-941d-adb4fe9154c3/comments/42237b58-24f2-439d-af07-f7fa20583016
+Content-Type: application/json
+
+{
+  "content": "업데이트된 댓글 내용입니다1."
+}
+
+### Product Comment 삭제 (Product ID, Comment ID 입력 필요)
+DELETE http://localhost:3000/products/1ca83f99-521c-4361-941d-adb4fe9154c3/comments/f2b2349d-ade8-462f-ba80-c574e93e0206
+
+
+
+
+
+
+### 첫 번째 페이지 article Comment 조회 (article ID 입력 필요)
+# 예시: GET {{baseUrl}}/articles/YOUR_article_ID/comments?take=5
+GET http://localhost:3000/articles/71079d6e-0d77-4cc6-be2e-01c7688ce4ab/comments?take=5
+
+### 다음 페이지 article Comment 조회 (article ID와 이전 응답의 nextCursor 값 입력 필요)
+# 예시: GET {{baseUrl}}/articles/YOUR_article_ID/comments?take=5&cursor=NEXT_CURSOR_VALUE
+GET http://localhost:3000/articles/71079d6e-0d77-4cc6-be2e-01c7688ce4ab/comments?take=5&cursor=99710df0-16bc-40f2-af0e-0aaa3483ba02
+
+### 새 article Comment 생성 (article ID 입력 필요)
+POST http://localhost:3000/articles/71079d6e-0d77-4cc6-be2e-01c7688ce4ab/comments
+Content-Type: application/json
+
+{
+  "content": "이 제품에 대한 첫 번째 댓글입니다!"
+}
+
+### 특정 article Comment 조회 (article ID, Comment ID 입력 필요)
+GET http://localhost:3000/articles/71079d6e-0d77-4cc6-be2e-01c7688ce4ab/comments/bb4d3a47-d928-4bb6-827e-601aae1619db
+
+### article Comment 업데이트 (article ID, Comment ID 입력 필요)
+PATCH http://localhost:3000/articles/71079d6e-0d77-4cc6-be2e-01c7688ce4ab/comments/bb4d3a47-d928-4bb6-827e-601aae1619db
 Content-Type: application/json
 
 {
   "content": "업데이트된 댓글 내용입니다."
 }
 
-### Product Comment 삭제 (Product ID, Comment ID 입력 필요)
-DELETE http://localhost:3000/products/82c3b880-8f04-45f3-886c-a25f1749a7f0/comments/d85b6c16-3af8-4b7a-862d-93b5df446a0f
+### article Comment 삭제 (article ID, Comment ID 입력 필요)
+DELETE http://localhost:3000/articles/71079d6e-0d77-4cc6-be2e-01c7688ce4ab/comments/ce9e8e3e-9a52-42b7-99c1-7f4caedb0a1b

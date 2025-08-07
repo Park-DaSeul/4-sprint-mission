@@ -18,3 +18,8 @@ export const updateArticleSchema = createArticleSchema.partial();
 export const articleIdSchema = z.object({
   id: z.uuid({ message: '유효하지 않은 게시판 ID 형식입니다.' }),
 });
+
+// articleId를 사용하기 위한 스키마
+export const articleParamSchema = z.object({
+  articleId: z.uuid({ message: '유효하지 않은 게시판 ID 형식입니다.' }),
+});
