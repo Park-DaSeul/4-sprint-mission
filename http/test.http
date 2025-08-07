@@ -46,7 +46,7 @@ GET http://localhost:3000/articles
 GET http://localhost:3000/articles?offset=0&limit=5&order=recent
 
 ### 2-1. 특정 조건으로 상품 조회 (GET /articles?search=고급)
-GET http://localhost:3000/articles?search=고급
+GET http://localhost:3000/articles?search=미션
 
 ### 새 Article 생성
 POST http://localhost:3000/articles

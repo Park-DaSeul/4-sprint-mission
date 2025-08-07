@@ -19,6 +19,7 @@ model Product {
   description     String?
   price           Int
   tags            String[]
+  image           String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   productComments ProductComment[]
@@ -37,6 +38,7 @@ model Article {
   id              String           @id @default(uuid())
   title           String
   content         String?
+  image           String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   articleComments ArticleComment[]

@@ -7,6 +7,7 @@ import {
   updateProductSchema,
   productIdSchema,
 } from '../../schemas/products/productSchema.js';
+import { uploadProductImage } from '../../utils/uploads/productUpload.js';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -49,10 +50,16 @@ router
     }),
   )
   .post(
+    uploadProductImage.single('image'),
     asyncHandler(async (req, res) => {
       const newData = createProductSchema.parse(req.body); //유효성 검사
+      const imagePath = req.file ? req.file.path : null; //이미지파일 검사
+
       const product = await prisma.product.create({
-        data: newData,
+        data: {
+          image: imagePath,
+          ...newData,
+        },
       });
       res.status(201).json(product);
     }),

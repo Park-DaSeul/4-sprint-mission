@@ -7,6 +7,7 @@ import {
   updateArticleSchema,
   articleIdSchema,
 } from '../../schemas/articles/articleSchema.js';
+import { uploadArticleImage } from '../../utils/uploads/articleUpload.js';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -49,10 +50,16 @@ router
     }),
   )
   .post(
+    uploadArticleImage.single('image'),
     asyncHandler(async (req, res) => {
       const newData = createArticleSchema.parse(req.body); //유효성 검사
+      const imagePath = req.file ? req.file.path : null; //이미지파일 검사
+
       const article = await prisma.article.create({
-        data: newData,
+        data: {
+          image: imagePath,
+          ...newData,
+        },
       });
       res.status(201).json(article);
     }),
