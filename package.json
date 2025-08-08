@@ -23,5 +23,8 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "zod": "^4.0.15"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }
