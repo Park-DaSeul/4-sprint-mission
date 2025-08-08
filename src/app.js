@@ -1,11 +1,18 @@
 import * as dotenv from 'dotenv';
 import express from 'express';
+import cors from 'cors';
 import productsRouter from './routes/products/products.js';
 import articlesRouter from './routes/articles/articles.js';
 
 dotenv.config();
 
 const app = express();
+
+//cors 설정
+const corsOptions = {
+  origin: ['http://127.0.0.1:3000', 'http://localhost:5173'],
+};
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use('/products', productsRouter);
