@@ -1,5 +1,5 @@
 import prisma from '../libs/prisma.js';
-import { getOneByIdOrFail } from '../utils/index.js';
+import { getOneByIdOrFail, userSelect, commentSelect } from '../utils/index.js';
 
 // 모든 댓글 조회
 export const getComments = async (query) => {
@@ -18,6 +18,12 @@ export const getComments = async (query) => {
     skip: cursor ? 1 : 0,
     cursor: cursor ? { id: cursor } : undefined,
     orderBy: { createdAt: 'desc' },
+    select: {
+      ...commentSelect,
+      user: {
+        select: userSelect,
+      },
+    },
   });
 
   const lastCommentInResults = comments[comments.length - 1];
@@ -30,6 +36,12 @@ export const getComments = async (query) => {
 export const getCommentById = async (id) => {
   const comment = await prisma.comment.findUnique({
     where: { id },
+    select: {
+      ...commentSelect,
+      user: {
+        select: userSelect,
+      },
+    },
   });
   if (!comment) throw new Error('댓글을 찾을 수 없습니다.');
   return comment;
@@ -65,6 +77,12 @@ export const createComment = async (userId, data) => {
       ...(type === 'PRODUCT' && { productId: resourceId }),
       userId,
     },
+    select: {
+      ...commentSelect,
+      user: {
+        select: userSelect,
+      },
+    },
   });
   return comment;
 };
@@ -85,6 +103,12 @@ export const updateComment = async (id, userId, data) => {
   const comment = await prisma.comment.update({
     where: { id },
     data: updateData,
+    select: {
+      ...commentSelect,
+      user: {
+        select: userSelect,
+      },
+    },
   });
   return comment;
 };

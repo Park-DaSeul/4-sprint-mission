@@ -1,13 +1,13 @@
 import { z } from 'zod';
-import { idSchema, contentSchema } from '../utils/validations.js';
+import { idSchema, contentSchema, cursorSchema, limitSchema, searchSchema } from '../utils/validations.js';
 
 // 모든 게시글 조회 (query)
 export const getComments = {
   query: z
     .object({
-      cursor: z.uuid().optional(),
-      limit: z.coerce.number().min(1).max(100).default(10),
-      search: z.string().optional(),
+      cursor: cursorSchema,
+      limit: limitSchema,
+      search: searchSchema,
     })
     .strict(),
 };

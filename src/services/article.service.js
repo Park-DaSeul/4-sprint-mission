@@ -1,10 +1,10 @@
 import prisma from '../libs/prisma.js';
-import { getOneByIdOrFail } from '../utils/index.js';
+import { getOneByIdOrFail, userSelect, articleSelect, commentSelect } from '../utils/index.js';
 
 // 모든 게시글 조회
 export const getArticles = async (query) => {
   const { offset = 0, limit = 10, order = 'recent', search } = query;
-  //offset 방식의 페이지 네이션
+  // offset 방식의 페이지 네이션
   let orderBy;
   switch (order) {
     case 'old':
@@ -14,7 +14,7 @@ export const getArticles = async (query) => {
     default:
       orderBy = { createdAt: 'desc' };
   }
-  //검색 기능 추가
+  // 검색 기능 추가
   const searchKeyword = search;
   let where = {};
 
@@ -32,6 +32,15 @@ export const getArticles = async (query) => {
     orderBy,
     skip: parseInt(offset),
     take: parseInt(limit),
+    select: {
+      ...articleSelect,
+      user: {
+        select: userSelect,
+      },
+      comments: {
+        select: commentSelect,
+      },
+    },
   });
   return articles;
 };
@@ -40,6 +49,15 @@ export const getArticles = async (query) => {
 export const getArticleById = async (id) => {
   const article = await prisma.article.findUnique({
     where: { id },
+    select: {
+      ...articleSelect,
+      user: {
+        select: userSelect,
+      },
+      comments: {
+        select: commentSelect,
+      },
+    },
   });
   if (!article) throw new Error('게시글을 찾을 수 없습니다.');
   return article;
@@ -55,6 +73,12 @@ export const createArticle = async (userId, data) => {
       content,
       imageUrl,
       userId,
+    },
+    select: {
+      ...articleSelect,
+      user: {
+        select: userSelect,
+      },
     },
   });
   return article;
@@ -78,6 +102,15 @@ export const updateArticle = async (id, userId, data) => {
   const article = await prisma.article.update({
     where: { id },
     data: updateData,
+    select: {
+      ...articleSelect,
+      user: {
+        select: userSelect,
+      },
+      comments: {
+        select: commentSelect,
+      },
+    },
   });
   return article;
 };

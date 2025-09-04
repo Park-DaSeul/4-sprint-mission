@@ -1,0 +1,179 @@
+# For more info on the REST Client extension, see: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+@baseUrl = http://localhost:3000
+
+# =================================================================
+# Auth
+# =================================================================
+
+###
+# @name signup
+POST {{baseUrl}}/auth/signup HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "test3@example.com",
+  "password": "password123",
+  "confirmPassword": "password123",
+  "nickname": "슬이당3"
+}
+
+###
+# @name login
+# After logging in, the REST Client extension will automatically handle the
+# access and refresh token cookies for subsequent requests.
+POST {{baseUrl}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+   "email": "test3@example.com",
+  "password": "password123"
+}
+
+###
+# @name refresh
+POST {{baseUrl}}/auth/refresh HTTP/1.1
+Content-Type: application/json
+
+{ 
+}
+
+###
+# @name logout
+POST {{baseUrl}}/auth/logout HTTP/1.1
+
+###
+# @name getUser
+GET http://localhost:3000/users/me
+
+###
+# @name getUserProducts
+GET http://localhost:3000/users/me/products
+
+###
+# @name updateUser
+PUT http://localhost:3000/users/me
+Content-Type: application/json
+
+{
+  "nickname": "슬이당3",
+  "password": "password123",
+  "newPassword": "password123"
+}
+
+###
+# @name deleteUser
+DELETE http://localhost:3000/users/me
+Content-Type: application/json
+
+{
+  "password": "password123"
+}
+
+### 제품 테스트
+# @name createProduct
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "상품생성",
+  "description": "이건 테스트 시험입니다.",
+  "price": 99.99,
+  "tags": ["arewr"]
+}
+
+###
+# @name getProducts
+GET http://localhost:3000/products
+
+###
+# @name getProductById
+GET http://localhost:3000/products/8b76f30c-da95-49ed-8d9e-94b69279af34
+
+###
+# @name updateProduct
+PUT http://localhost:3000/products/2f611546-ad6f-46ef-bd2d-08c69a7aa3c2
+Content-Type: application/json
+
+{
+  "name": "수정수정",
+  "price": 129.99
+}
+
+###
+# @name deleteProduct
+DELETE http://localhost:3000/products/adca7dd9-6426-4605-b1ef-9456004bbd7a
+
+### 댓글 테스트
+# @name createComment
+POST http://localhost:3000/products/8b76f30c-da95-49ed-8d9e-94b69279af34/comments
+Content-Type: application/json
+
+{
+  "content": "이것도 테스트21212"
+}
+
+###
+# @name getComments
+GET http://localhost:3000/comments
+
+###
+# @name getCommentById
+GET http://localhost:3000/comments/089b11a5-e2b5-4969-a35e-3c2bff3a4da1
+
+###
+# @name updateComment
+PUT http://localhost:3000/comments/60d46fc1-3fd1-421d-a656-76359fe6dbc2
+Content-Type: application/json
+
+{
+  "content": "Updated test comment."
+}
+
+###
+# @name deleteComment
+DELETE http://localhost:3000/comments/089b11a5-e2b5-4969-a35e-3c2bff3a4da1
+
+
+# =================================================================
+# Articles (Manual ID Pasting)
+# =================================================================
+
+###
+# @name createArticle
+# 1. Run this request to create an article.
+# 2. Copy the "id" from the response body.
+POST {{baseUrl}}/articles HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "테스트로 만든다",
+  "content": "한글로 만들어야지"
+}
+
+
+###
+# @name getArticleById
+# 3. Paste the copied ID into the URL below and run the request.
+GET {{baseUrl}}/articles/f3201ef9-973e-4abb-8f46-686727dc9f3a HTTP/1.1
+
+
+###
+# @name updateArticle
+# 4. Use the same ID to update the article.
+PUT {{baseUrl}}/articles/d957aafa-dafa-4867-9f8d-a336a8dd80ec HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "아티클을 수정하자",
+  "content": "이건 수정된 내용"
+}
+
+###
+# @name deleteArticle
+# 5. Use the same ID to delete the article.
+DELETE {{baseUrl}}/articles/d957aafa-dafa-4867-9f8d-a336a8dd80ec HTTP/1.1
+
+# =================================================================
+# Products (Example)
+# =================================================================

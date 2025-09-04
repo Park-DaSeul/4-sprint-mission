@@ -6,16 +6,20 @@ import {
   priceSchema,
   tagsSchema,
   imageUrlSchema,
+  offsetSchema,
+  limitSchema,
+  orderSchema,
+  searchSchema,
 } from '../utils/validations.js';
 
 // 모든 상품 조회 (query)
 export const getProducts = {
   query: z
     .object({
-      offset: z.coerce.number().min(1).max(100).default(0),
-      limit: z.coerce.number().min(1).max(100).default(10),
-      order: z.string().optional(),
-      search: z.string().optional(),
+      offset: offsetSchema,
+      limit: limitSchema,
+      order: orderSchema,
+      search: searchSchema,
     })
     .strict(),
 };

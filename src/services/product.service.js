@@ -1,5 +1,5 @@
 import prisma from '../libs/prisma.js';
-import { getOneByIdOrFail } from '../utils/index.js';
+import { getOneByIdOrFail, userSelect, productSelect, commentSelect } from '../utils/index.js';
 
 // 모든 상품 조회
 export const getProducts = async (query) => {
@@ -32,6 +32,15 @@ export const getProducts = async (query) => {
     orderBy,
     skip: parseInt(offset),
     take: parseInt(limit),
+    select: {
+      ...productSelect,
+      user: {
+        select: userSelect,
+      },
+      comments: {
+        select: commentSelect,
+      },
+    },
   });
   return products;
 };
@@ -40,6 +49,15 @@ export const getProducts = async (query) => {
 export const getProductById = async (id) => {
   const product = await prisma.product.findUnique({
     where: { id },
+    select: {
+      ...productSelect,
+      user: {
+        select: userSelect,
+      },
+      comments: {
+        select: commentSelect,
+      },
+    },
   });
   if (!product) throw new Error('상품을 찾을 수 없습니다.');
   return product;
@@ -57,6 +75,12 @@ export const createProduct = async (userId, data) => {
       tags,
       imageUrl,
       userId,
+    },
+    select: {
+      ...productSelect,
+      user: {
+        select: userSelect,
+      },
     },
   });
   return product;
@@ -82,6 +106,15 @@ export const updateProduct = async (id, userId, data) => {
   const product = await prisma.product.update({
     where: { id },
     data: updateData,
+    select: {
+      ...productSelect,
+      user: {
+        select: userSelect,
+      },
+      comments: {
+        select: commentSelect,
+      },
+    },
   });
   return product;
 };

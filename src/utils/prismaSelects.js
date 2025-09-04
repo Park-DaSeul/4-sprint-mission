@@ -1,17 +1,35 @@
 // user 모델
-export const userSelect = {
+export const meSelect = {
   id: true,
-  name: true,
-  nickname: true,
   email: true,
+  nickname: true,
+  image: true,
 };
 
-// dish 모델
-export const dishSelect = {
+export const userSelect = {
+  nickname: true,
+};
+
+// article 모델
+export const articleSelect = {
   id: true,
   title: true,
-  description: true,
+  content: true,
   imageUrl: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
+// product 모델
+export const productSelect = {
+  id: true,
+  name: true,
+  description: true,
+  price: true,
+  tags: true,
+  imageUrl: true,
+  createdAt: true,
+  updatedAt: true,
 };
 
 // comment 모델
@@ -20,21 +38,4 @@ export const commentSelect = {
   content: true,
   createdAt: true,
   updatedAt: true,
-  user: {
-    select: userSelect,
-  },
-};
-
-// recipe 모델
-export const recipeSelect = {
-  id: true,
-  stepNumber: true,
-  instruction: true,
-  imageUrl: true,
-  duration: true,
-  createdAt: true,
-  updatedAt: true,
-  user: {
-    select: { id },
-  },
 };

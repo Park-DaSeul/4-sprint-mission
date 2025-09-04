@@ -1,23 +1,24 @@
 import express from 'express';
 import * as articleController from '../controllers/article.controller.js';
 import * as articleValidation from '../validations/article.validation.js';
-//import { authenticate } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
-import { asyncHandler } from '../../utils/asyncHandler.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import passport from '../libs/passport/index.js';
 import { commentRouter } from './comment.route.js';
 
-import { uploadArticleImage } from '../../utils/uploads/articleUpload.js';
+//import { uploadArticleImage } from '../../utils/uploads/articleUpload.js';
+//uploadArticleImage.single('image'),
 
 const articleRouter = express.Router();
 
 // 모든 게시글 조회
-articleRouter
-  .route('/')
-  .get(validate(articleValidation.getArticles), asyncHandler(articleController.getArticles))
-  .post(
-    uploadArticleImage.single('image'),
-    (validate(articleValidation.createArticle), asyncHandler(articleController.createArticle)),
-  );
+articleRouter.get('/', validate(articleValidation.getArticles), asyncHandler(articleController.getArticles));
+
+// --- 여기부터 로그인 필요 ---
+articleRouter.use(passport.authenticate('access-token', { session: false }));
+
+// 게시글 생성
+articleRouter.post('/', (validate(articleValidation.createArticle), asyncHandler(articleController.createArticle)));
 
 // 특정 게시글 조회, 수정, 삭제 (/:id)
 articleRouter

@@ -1,4 +1,4 @@
-import prisma from './prisma.js';
+import prisma from '../libs/prisma.js';
 
 // id로 레코드 가져오기
 // 사용예문
