@@ -49,6 +49,10 @@ GET http://localhost:3000/users/me
 ###
 # @name getUserProducts
 GET http://localhost:3000/users/me/products
+###
+# @name getUserLikedProducts
+GET http://localhost:3000/users/me/likess
+
 
 ###
 # @name updateUser
@@ -76,7 +80,7 @@ POST http://localhost:3000/products
 Content-Type: application/json
 
 {
-  "productName": "상품생성",
+  "productName": "상품생성2",
   "description": "이건 테스트 시험입니다.",
   "price": 99.99,
   "tags": ["arewr"]
@@ -197,4 +201,4 @@ POST {{baseUrl}}/articles/554ae80a-e0ac-43b8-955a-39c93c253654/articleLikes
 
 ###
 # @name createProductLike
-POST {{baseUrl}}/products/f9d15193-7719-4258-b57b-a9b47f3928ef/productLikes
+POST {{baseUrl}}/products/7195ca49-a16c-48b9-b2ae-24c52849dbb7/productLikes

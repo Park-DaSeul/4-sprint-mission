@@ -29,3 +29,10 @@ export const getUserProducts = async (req, res) => {
   const user = await userService.getUserProducts(id);
   res.json({ success: true, data: user });
 };
+
+// 사용자가 좋아요 누른 상품 목록조회
+export const getUserLikedProducts = async (req, res) => {
+  const { id } = req.user;
+  const user = await userService.getUserLikedProducts(id);
+  res.json({ success: true, data: user });
+};

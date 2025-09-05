@@ -8,8 +8,6 @@ import { commentRouter } from './comment.route.js';
 import { productLikeRouter } from './productLike.route.js';
 import { optionalAuthenticate } from '../middlewares/optionalAuth.middleware.js';
 
-//import { uploadProductImage } from '../../utils/uploads/productUpload.js';
-
 const productRouter = express.Router();
 
 // 모든 상품 조회

@@ -8,9 +8,6 @@ import { commentRouter } from './comment.route.js';
 import { articleLikeRouter } from './articleLike.route.js';
 import { optionalAuthenticate } from '../middlewares/optionalAuth.middleware.js';
 
-//import { uploadArticleImage } from '../../utils/uploads/articleUpload.js';
-//uploadArticleImage.single('image'),
-
 const articleRouter = express.Router();
 
 // 모든 게시글 조회

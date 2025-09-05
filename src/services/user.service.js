@@ -64,3 +64,24 @@ export const getUserProducts = async (id) => {
   if (!user) throw new Error('사용자가 등록한 상품을 찾을 수 없습니다.');
   return user;
 };
+
+// 사용자가 좋아요 누른 상품 목록조회
+export const getUserLikedProducts = async (id) => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      productLikes: {
+        select: {
+          product: {
+            select: productSelect,
+          },
+        },
+      },
+    },
+  });
+  if (!user) throw new Error('사용자가 좋아요 누른 상품을 찾을 수 없습니다.');
+
+  const userData = user.productLikes.map((productLike) => productLike.product);
+
+  return userData;
+};

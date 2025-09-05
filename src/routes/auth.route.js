@@ -5,8 +5,6 @@ import { validate } from '../middlewares/validate.middleware.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import passport from '../libs/passport/index.js';
 
-//import { uploadAuthImage } from '../../utils/uploads/authUpload.js';
-
 const authRouter = express.Router();
 
 // 회원가입
