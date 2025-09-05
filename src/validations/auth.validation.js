@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { emailSchema, nicknameSchema, imageSchema, passwordSchema } from '../utils/validations.js';
+import { emailSchema, nicknameSchema, imageUrlSchema, passwordSchema } from '../utils/validations.js';
 
 // 회원가입 (body)
 export const signup = {
@@ -7,7 +7,7 @@ export const signup = {
     .object({
       email: emailSchema,
       nickname: nicknameSchema,
-      image: imageSchema,
+      imageUrl: imageUrlSchema,
       password: passwordSchema,
       confirmPassword: passwordSchema,
     })

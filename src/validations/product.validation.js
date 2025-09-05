@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import {
   idSchema,
-  nameSchema,
+  productNameSchema,
   descriptionSchema,
   priceSchema,
   tagsSchema,
@@ -37,7 +37,7 @@ export const getProductById = {
 export const createProduct = {
   body: z
     .object({
-      name: nameSchema,
+      productName: productNameSchema,
       description: descriptionSchema,
       price: priceSchema,
       tags: tagsSchema,
@@ -55,7 +55,7 @@ export const updateProduct = {
     .strict(),
   body: z
     .object({
-      name: nameSchema.optional(),
+      productName: productNameSchema.optional(),
       description: descriptionSchema.optional(),
       price: priceSchema.optional(),
       tags: tagsSchema.optional(),

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { idSchema, contentSchema, cursorSchema, limitSchema, searchSchema } from '../utils/validations.js';
 
-// 모든 게시글 조회 (query)
+// 모든 댓글 조회 (query)
 export const getComments = {
   query: z
     .object({
@@ -12,7 +12,7 @@ export const getComments = {
     .strict(),
 };
 
-// 특정 게시글 조회 (params)
+// 특정 댓글 조회 (params)
 export const getCommentById = {
   params: z
     .object({
@@ -21,7 +21,7 @@ export const getCommentById = {
     .strict(),
 };
 
-// 게시글 생성 (body)
+// 댓글 생성 (body)
 export const createComment = {
   body: z
     .object({
@@ -30,7 +30,7 @@ export const createComment = {
     .strict(),
 };
 
-// 게시글 수정 (body + params)
+// 댓글 수정 (body + params)
 export const updateComment = {
   params: z
     .object({
@@ -44,7 +44,7 @@ export const updateComment = {
     .strict(),
 };
 
-// 게시글 삭제 (params)
+// 댓글 삭제 (params)
 export const deleteComment = {
   params: z
     .object({

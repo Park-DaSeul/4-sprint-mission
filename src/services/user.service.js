@@ -13,7 +13,7 @@ export const getUser = async (id) => {
 
 // 사용자 수정
 export const updateUser = async (id, data) => {
-  const { nickname, image, password, newPassword } = data;
+  const { nickname, imageUrl, password, newPassword } = data;
   // 사용자가 존재하는지 확인
   const userData = await getOneByIdOrFail(prisma.user, id, '사용자');
   if (userData.id !== id) {
@@ -23,7 +23,7 @@ export const updateUser = async (id, data) => {
 
   const updateData = {
     ...(nickname && { nickname }),
-    ...(image && { image }),
+    ...(imageUrl && { imageUrl }),
     // 비밀번호 해시 처리
     ...(newPassword && { password: await hashPassword(newPassword) }),
   };

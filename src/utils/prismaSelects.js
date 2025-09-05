@@ -1,16 +1,16 @@
-// user 모델
+// auth + user
 export const meSelect = {
   id: true,
   email: true,
   nickname: true,
-  image: true,
+  imageUrl: true,
 };
 
 export const userSelect = {
   nickname: true,
 };
 
-// article 모델
+// article
 export const articleSelect = {
   id: true,
   title: true,
@@ -20,10 +20,10 @@ export const articleSelect = {
   updatedAt: true,
 };
 
-// product 모델
+// product
 export const productSelect = {
   id: true,
-  name: true,
+  productName: true,
   description: true,
   price: true,
   tags: true,
@@ -32,10 +32,24 @@ export const productSelect = {
   updatedAt: true,
 };
 
-// comment 모델
+// comment
 export const commentSelect = {
   id: true,
   content: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
+// articltLike
+export const articleLikeSelect = {
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
+// productLike
+export const productLikeSelect = {
+  id: true,
   createdAt: true,
   updatedAt: true,
 };

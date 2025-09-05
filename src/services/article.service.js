@@ -1,8 +1,9 @@
+import { fa } from 'zod/locales';
 import prisma from '../libs/prisma.js';
 import { getOneByIdOrFail, userSelect, articleSelect, commentSelect } from '../utils/index.js';
 
 // 모든 게시글 조회
-export const getArticles = async (query) => {
+export const getArticles = async (query, userId) => {
   const { offset = 0, limit = 10, order = 'recent', search } = query;
   // offset 방식의 페이지 네이션
   let orderBy;
@@ -27,6 +28,9 @@ export const getArticles = async (query) => {
     };
   }
 
+  // userId가 유효할 때만 필터를 적용하는 객체 생성
+  const likesQuery = userId ? { likes: { where: { userId }, select: { id: true } } } : {};
+
   const articles = await prisma.article.findMany({
     where,
     orderBy,
@@ -40,13 +44,23 @@ export const getArticles = async (query) => {
       comments: {
         select: commentSelect,
       },
+      ...likesQuery,
     },
   });
-  return articles;
+
+  // isLiked로 좋아요를 불리언 값으로 변환
+  const articlesData = articles.map((article) => {
+    const isLiked = article.likes ? article.likes.length > 0 : false;
+    // likes 필드를 제거하고 isLiked 필드를 추가
+    const { likes, ...rest } = article;
+    return { ...rest, isLiked };
+  });
+
+  return articlesData;
 };
 
 // 특정 게시글 조회
-export const getArticleById = async (id) => {
+export const getArticleById = async (id, userId) => {
   const article = await prisma.article.findUnique({
     where: { id },
     select: {
@@ -57,10 +71,25 @@ export const getArticleById = async (id) => {
       comments: {
         select: commentSelect,
       },
+      likes: {
+        where: {
+          userId,
+        },
+        select: {
+          id: true,
+        },
+      },
     },
   });
   if (!article) throw new Error('게시글을 찾을 수 없습니다.');
-  return article;
+
+  // isLiked로 좋아요를 불리언 값으로 변환
+  const isLiked = article.likes.length > 0;
+  // likes 필드를 제거하고 isLiked 필드를 추가
+  const { likes, ...rest } = article;
+  const articleData = { ...rest, isLiked };
+
+  return articleData;
 };
 
 // 게시글 생성

@@ -5,13 +5,20 @@ import { validate } from '../middlewares/validate.middleware.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import passport from '../libs/passport/index.js';
 import { commentRouter } from './comment.route.js';
+import { productLikeRouter } from './productLike.route.js';
+import { optionalAuthenticate } from '../middlewares/optionalAuth.middleware.js';
 
 //import { uploadProductImage } from '../../utils/uploads/productUpload.js';
 
 const productRouter = express.Router();
 
 // 모든 상품 조회
-productRouter.get('/', validate(productValidation.getProducts), asyncHandler(productController.getProducts));
+productRouter.get(
+  '/',
+  optionalAuthenticate,
+  validate(productValidation.getProducts),
+  asyncHandler(productController.getProducts),
+);
 
 // --- 여기부터 로그인 필요 ---
 productRouter.use(passport.authenticate('access-token', { session: false }));
@@ -27,5 +34,6 @@ productRouter
   .delete(validate(productValidation.deleteProduct), asyncHandler(productController.deleteProduct));
 
 productRouter.use('/:productId/comments', commentRouter);
+productRouter.use('/:productId/productLikes', productLikeRouter);
 
 export { productRouter };

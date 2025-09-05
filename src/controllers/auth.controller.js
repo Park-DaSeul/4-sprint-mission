@@ -14,7 +14,7 @@ export const login = async (req, res) => {
   const user = req.user;
   const { accessToken, refreshToken } = authService.login(user.id);
   tokensAndSetCookies(res, accessToken, refreshToken);
-  res.status(200).json({ accessToken, refreshToken });
+  res.status(200).json({ success: true });
 };
 
 // 토큰 재발급
@@ -22,7 +22,7 @@ export const refresh = (req, res) => {
   const user = req.user;
   const { accessToken, refreshToken } = authService.refresh(user.id);
   tokensAndSetCookies(res, accessToken, refreshToken);
-  res.status(200).json({ accessToken, refreshToken });
+  res.status(200).json({ success: true });
 };
 
 // 로그아웃
@@ -30,5 +30,5 @@ export const logout = (req, res) => {
   res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
   res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
 
-  res.status(200).json();
+  res.status(200).json({ success: true, message: '로그아웃 되었습니다.' });
 };

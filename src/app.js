@@ -31,4 +31,4 @@ app.use('/comments', commentRouter);
 
 app.use(errorHandler); //전역 에러핸들러
 
-app.listen(process.env.PORT, () => console.log('서버 시작'));
+app.listen(process.env.PORT || 3000, () => console.log('서버 시작'));

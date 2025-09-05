@@ -4,7 +4,7 @@ import { generateTokens } from '../libs/token.js';
 
 // 회원가입
 export const signup = async (data) => {
-  const { email, nickname, image, password, confirmPassword } = data;
+  const { email, nickname, imageUrl, password, confirmPassword } = data;
 
   // 이메일 중복 확인
   const existingUser = await checkUserExistsByEmail(email);
@@ -24,7 +24,7 @@ export const signup = async (data) => {
     data: {
       email,
       nickname,
-      image,
+      imageUrl,
       password: hashedPassword,
     },
     select: userSelect,

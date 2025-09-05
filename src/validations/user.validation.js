@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { nicknameSchema, imageSchema, passwordSchema, emailSchema } from '../utils/validations.js';
+import { nicknameSchema, imageUrlSchema, passwordSchema, emailSchema } from '../utils/validations.js';
 
 // 사용자 수정 (body)
 export const updateUser = {
@@ -7,7 +7,7 @@ export const updateUser = {
     .object({
       email: emailSchema.optional(),
       nickname: nicknameSchema.optional(),
-      image: imageSchema.optional(),
+      imageUrl: imageUrlSchema.optional(),
       newPassword: passwordSchema.optional(),
       password: passwordSchema,
     })

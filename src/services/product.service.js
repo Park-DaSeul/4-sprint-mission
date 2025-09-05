@@ -2,7 +2,7 @@ import prisma from '../libs/prisma.js';
 import { getOneByIdOrFail, userSelect, productSelect, commentSelect } from '../utils/index.js';
 
 // 모든 상품 조회
-export const getProducts = async (query) => {
+export const getProducts = async (query, userId) => {
   const { offset = 0, limit = 10, order = 'recent', search } = query;
   // offset 방식의 페이지 네이션
   let orderBy;
@@ -27,6 +27,9 @@ export const getProducts = async (query) => {
     };
   }
 
+  // userId가 유효할 때만 필터를 적용하는 객체 생성
+  const likesQuery = userId ? { likes: { where: { userId }, select: { id: true } } } : {};
+
   const products = await prisma.product.findMany({
     where,
     orderBy,
@@ -40,13 +43,23 @@ export const getProducts = async (query) => {
       comments: {
         select: commentSelect,
       },
+      ...likesQuery,
     },
   });
-  return products;
+
+  // isLiked로 좋아요를 불리언 값으로 변환
+  const productsData = products.map((product) => {
+    const isLiked = product.likes ? product.likes.length > 0 : false;
+    // likes 필드를 제거하고 isLiked 필드를 추가
+    const { likes, ...rest } = product;
+    return { ...rest, isLiked };
+  });
+
+  return productsData;
 };
 
 // 특정 상품 조회
-export const getProductById = async (id) => {
+export const getProductById = async (id, userId) => {
   const product = await prisma.product.findUnique({
     where: { id },
     select: {
@@ -57,19 +70,34 @@ export const getProductById = async (id) => {
       comments: {
         select: commentSelect,
       },
+      likes: {
+        where: {
+          userId,
+        },
+        select: {
+          id: true,
+        },
+      },
     },
   });
   if (!product) throw new Error('상품을 찾을 수 없습니다.');
-  return product;
+
+  // isLiked로 좋아요를 불리언 값으로 변환
+  const isLiked = product.likes.length > 0;
+  // likes 필드를 제거하고 isLiked 필드를 추가
+  const { likes, ...rest } = product;
+  const productData = { ...rest, isLiked };
+
+  return productData;
 };
 
 // 상품 생성
 export const createProduct = async (userId, data) => {
-  const { name, description, price, tags, imageUrl } = data;
+  const { productName, description, price, tags, imageUrl } = data;
 
   const product = await prisma.product.create({
     data: {
-      name,
+      productName,
       description,
       price,
       tags,
@@ -88,7 +116,7 @@ export const createProduct = async (userId, data) => {
 
 // 상품 수정
 export const updateProduct = async (id, userId, data) => {
-  const { name, description, price, tags, imageUrl } = data;
+  const { productName, description, price, tags, imageUrl } = data;
   // 상품이 존재하는지 확인
   const productData = await getOneByIdOrFail(prisma.product, id, '상품');
   if (productData.userId !== userId) {
@@ -96,7 +124,7 @@ export const updateProduct = async (id, userId, data) => {
   }
 
   const updateData = {
-    ...(name && { name }),
+    ...(productName && { productName }),
     ...(description && { description }),
     ...(price && { price }),
     ...(tags && { tags }),

@@ -5,6 +5,8 @@ import { validate } from '../middlewares/validate.middleware.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import passport from '../libs/passport/index.js';
 import { commentRouter } from './comment.route.js';
+import { articleLikeRouter } from './articleLike.route.js';
+import { optionalAuthenticate } from '../middlewares/optionalAuth.middleware.js';
 
 //import { uploadArticleImage } from '../../utils/uploads/articleUpload.js';
 //uploadArticleImage.single('image'),
@@ -12,7 +14,12 @@ import { commentRouter } from './comment.route.js';
 const articleRouter = express.Router();
 
 // 모든 게시글 조회
-articleRouter.get('/', validate(articleValidation.getArticles), asyncHandler(articleController.getArticles));
+articleRouter.get(
+  '/',
+  optionalAuthenticate,
+  validate(articleValidation.getArticles),
+  asyncHandler(articleController.getArticles),
+);
 
 // --- 여기부터 로그인 필요 ---
 articleRouter.use(passport.authenticate('access-token', { session: false }));
@@ -28,5 +35,6 @@ articleRouter
   .delete(validate(articleValidation.deleteArticle), asyncHandler(articleController.deleteArticle));
 
 articleRouter.use('/:articleId/comments', commentRouter);
+articleRouter.use('/:articleId/articleLikes', articleLikeRouter);
 
 export { articleRouter };
