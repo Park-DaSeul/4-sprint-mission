@@ -1,12 +1,31 @@
-import { fa } from 'zod/locales';
 import prisma from '../libs/prisma.js';
 import { getOneByIdOrFail, userSelect, articleSelect, commentSelect } from '../utils/index.js';
+import type { Prisma } from '@prisma/client';
+
+interface GetArticlesQuery {
+  offset?: number;
+  limit?: number;
+  order?: string;
+  search?: string;
+}
+
+interface CreateArticleData {
+  title: string;
+  content: string;
+  imageUrl?: string;
+}
+
+interface UpdateArticleData {
+  title?: string;
+  content?: string;
+  imageUrl?: string;
+}
 
 // 모든 게시글 조회
-export const getArticles = async (query, userId) => {
+export const getArticles = async (query: GetArticlesQuery, userId: string | null) => {
   const { offset = 0, limit = 10, order = 'recent', search } = query;
   // offset 방식의 페이지 네이션
-  let orderBy;
+  let orderBy: Prisma.ArticleOrderByWithRelationInput;
   switch (order) {
     case 'old':
       orderBy = { createdAt: 'asc' };
@@ -17,7 +36,7 @@ export const getArticles = async (query, userId) => {
   }
   // 검색 기능 추가
   const searchKeyword = search;
-  let where = {};
+  let where: Prisma.ArticleWhereInput = {};
 
   if (searchKeyword) {
     where = {
@@ -34,8 +53,8 @@ export const getArticles = async (query, userId) => {
   const articles = await prisma.article.findMany({
     where,
     orderBy,
-    skip: parseInt(offset),
-    take: parseInt(limit),
+    skip: offset,
+    take: limit,
     select: {
       ...articleSelect,
       user: {
@@ -60,7 +79,7 @@ export const getArticles = async (query, userId) => {
 };
 
 // 특정 게시글 조회
-export const getArticleById = async (id, userId) => {
+export const getArticleById = async (id: string, userId: string) => {
   const article = await prisma.article.findUnique({
     where: { id },
     select: {
@@ -93,14 +112,14 @@ export const getArticleById = async (id, userId) => {
 };
 
 // 게시글 생성
-export const createArticle = async (userId, data) => {
+export const createArticle = async (userId: string, data: CreateArticleData) => {
   const { title, content, imageUrl } = data;
 
   const article = await prisma.article.create({
     data: {
       title,
       content,
-      imageUrl,
+      imageUrl: imageUrl ?? null,
       userId,
     },
     select: {
@@ -114,7 +133,7 @@ export const createArticle = async (userId, data) => {
 };
 
 // 게시글 수정
-export const updateArticle = async (id, userId, data) => {
+export const updateArticle = async (id: string, userId: string, data: UpdateArticleData) => {
   const { title, content, imageUrl } = data;
   // 게시글이 존재하는지 확인
   const articleData = await getOneByIdOrFail(prisma.article, id, '게시글');
@@ -145,7 +164,7 @@ export const updateArticle = async (id, userId, data) => {
 };
 
 // 게시글 삭제
-export const deleteArticle = async (id, userId) => {
+export const deleteArticle = async (id: string, userId: string) => {
   // 게시글이 존재하는지 확인
   const articleData = await getOneByIdOrFail(prisma.article, id, '게시글');
   if (articleData.userId !== userId) {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { idSchema, contentSchema, cursorSchema, limitSchema, searchSchema } from '../utils/validations.js';
+import { idSchema, commentContentSchema, cursorSchema, limitSchema, searchSchema } from '../utils/validations.js';
 
 // 모든 댓글 조회 (query)
 export const getComments = {
@@ -25,7 +25,7 @@ export const getCommentById = {
 export const createComment = {
   body: z
     .object({
-      content: contentSchema,
+      content: commentContentSchema,
     })
     .strict(),
 };
@@ -39,7 +39,7 @@ export const updateComment = {
     .strict(),
   body: z
     .object({
-      content: contentSchema.optional(),
+      content: commentContentSchema.optional(),
     })
     .strict(),
 };

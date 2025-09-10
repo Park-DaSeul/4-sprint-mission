@@ -1,8 +1,9 @@
-import LocalStrategy from 'passport-local';
+import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcrypt';
 import prisma from '../prisma.js';
+import type { VerifyFunction } from 'passport-local';
 
-export const localStrategy = new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
+const verifyCallback: VerifyFunction = async (email, password, done) => {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -20,6 +21,8 @@ export const localStrategy = new LocalStrategy({ usernameField: 'email' }, async
     // 사용자를 찾지 못했거나 비밀번호가 틀린 경우
     return done(null, false, { message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
   } catch (error) {
-    done(error, false);
+    done(error instanceof Error ? error : new Error('알 수 없는 오류가 발생했습니다.'), false);
   }
-});
+};
+
+export const localStrategy = new LocalStrategy({ usernameField: 'email' }, verifyCallback);

@@ -4,17 +4,27 @@ import prisma from '../libs/prisma.js';
 // 사용예문
 // const userData = await getOneByIdOrFail(prisma.user, userId, '사용자', include: { posts: true });
 // const postData = await getOneByIdOrFail(prisma.post, postId, '게시물');
-export const getOneByIdOrFail = async (model, id, modelName, options = {}) => {
-  const record = await model.findUnique({
+export const getOneByIdOrFail = async <T extends PrismaModelName>(
+  modelName: T,
+  id: string,
+  name: string,
+  options = {},
+) => {
+  const model = prisma[modelName.toLowerCase() as Lowercase<T>];
+  const record = await (model as any).findUnique({
     where: { id },
     ...options, // select와 include 옵션을 여기에 적용
   });
-  if (!record) throw new Error(`${modelName}를 찾을 수 없습니다.`);
+
+  if (!record) {
+    throw new Error(`${name}를 찾을 수 없습니다.`);
+  }
+
   return record;
 };
 
 // 이메일로 사용자 가져오기
-export const getUserByEmailOrFail = async (email) => {
+export const getUserByEmailOrFail = async (email: string) => {
   const user = await prisma.user.findUnique({
     where: { email },
   });
@@ -23,7 +33,7 @@ export const getUserByEmailOrFail = async (email) => {
 };
 
 // 특정 이메일을 가진 사용자가 존재하는지 확인
-export const checkUserExistsByEmail = async (email) => {
+export const checkUserExistsByEmail = async (email: string) => {
   const user = await prisma.user.findUnique({
     where: { email },
   });

@@ -1,14 +1,16 @@
+import type { Prisma } from '@prisma/client';
+
 // auth + user
 export const meSelect = {
   id: true,
   email: true,
   nickname: true,
   imageUrl: true,
-};
+} satisfies Prisma.UserSelect;
 
 export const userSelect = {
   nickname: true,
-};
+} satisfies Prisma.UserSelect;
 
 // article
 export const articleSelect = {
@@ -18,7 +20,7 @@ export const articleSelect = {
   imageUrl: true,
   createdAt: true,
   updatedAt: true,
-};
+} satisfies Prisma.ArticleSelect;
 
 // product
 export const productSelect = {
@@ -30,7 +32,7 @@ export const productSelect = {
   imageUrl: true,
   createdAt: true,
   updatedAt: true,
-};
+} satisfies Prisma.ProductSelect;
 
 // comment
 export const commentSelect = {
@@ -38,18 +40,18 @@ export const commentSelect = {
   content: true,
   createdAt: true,
   updatedAt: true,
-};
+} satisfies Prisma.CommentSelect;
 
 // articltLike
 export const articleLikeSelect = {
   id: true,
   createdAt: true,
   updatedAt: true,
-};
+} satisfies Prisma.ArticleLikeSelect;
 
 // productLike
 export const productLikeSelect = {
   id: true,
   createdAt: true,
   updatedAt: true,
-};
+} satisfies Prisma.ProductLikeSelect;

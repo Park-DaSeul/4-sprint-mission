@@ -35,7 +35,7 @@ export const titleSchema = z
   .string()
   .min(1, '제목은 최소 1글자 이상이어야 합니다.')
   .max(100, '제목은 최대 100글자까지 가능합니다.');
-export const contentSchema = z
+export const articleContentSchema = z
   .string()
   .min(1, '내용은 최소 1글자 이상이어야 합니다.')
   .max(1000, '내용은 최대 1000글자까지 가능합니다.');
@@ -61,7 +61,7 @@ export const tagsSchema = z
   });
 
 // comment
-export const contentShema = z
+export const commentContentSchema = z
   .string()
   .min(1, '댓글은 최소 1글자 이상이어야 합니다.')
   .max(600, '댓은 최대 500글자까지 가능합니다.');
