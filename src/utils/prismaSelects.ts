@@ -9,6 +9,7 @@ export const meSelect = {
 } satisfies Prisma.UserSelect;
 
 export const userSelect = {
+  id: true,
   nickname: true,
 } satisfies Prisma.UserSelect;
 

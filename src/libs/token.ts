@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_SECRET } from './constants.js';
 
-interface Tokens {
+export interface Tokens {
   accessToken: string;
   refreshToken: string;
 }

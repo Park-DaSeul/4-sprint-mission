@@ -114,7 +114,7 @@ POST http://localhost:3000/products/f9d15193-7719-4258-b57b-a9b47f3928ef/comment
 Content-Type: application/json
 
 {
-  "content": "이것도 테스트21212"
+  "content": "생성테스트21212"
 }
 
 ### 댓글 테스트

@@ -6,6 +6,8 @@ declare global {
 
     interface Request {
       user?: User;
+      resourceType?: 'ARTICLE' | 'PRODUCT';
+      resourceId?: string;
       validatedData?: {
         body?: unknown;
         query?: unknown;

@@ -1,10 +1,42 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { ZodObject } from 'zod';
+import type { ZodObject, ZodRawShape } from 'zod';
 
-export const validate = (schema: ZodObject<any, any>) => {
+export const validate = <
+  TParams extends ZodObject<ZodRawShape>,
+  TQuery extends ZodObject<ZodRawShape>,
+  TBody extends ZodObject<ZodRawShape>,
+>(schemas: {
+  body?: TBody;
+  params?: TParams;
+  query?: TQuery;
+}) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
-      req.validatedData = schema.parse(req);
+      req.validatedData = {};
+
+      if (schemas.body) {
+        const { success, data, error } = schemas.body.safeParse(req.body);
+        if (!success) {
+          return next(error);
+        }
+        req.validatedData.body = data;
+      }
+
+      if (schemas.query) {
+        const { success, data, error } = schemas.query.safeParse(req.query);
+        if (!success) {
+          return next(error);
+        }
+        req.validatedData.query = data;
+      }
+
+      if (schemas.params) {
+        const { success, data, error } = schemas.params.safeParse(req.params);
+        if (!success) {
+          return next(error);
+        }
+        req.validatedData.params = data;
+      }
 
       next();
     } catch (err) {
