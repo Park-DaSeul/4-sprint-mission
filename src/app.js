@@ -1,8 +1,14 @@
-import * as dotenv from 'dotenv';
+import dotenv from 'dotenv';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import productsRouter from './routes/products/products.js';
-import articlesRouter from './routes/articles/articles.js';
+import passport from './libs/passport/index.js';
+import { userRouter } from './routes/user.route.js';
+import { productRouter } from './routes/product.route.js';
+import { articleRouter } from './routes/article.route.js';
+import { commentRouter } from './routes/comment.route.js';
+import { authRouter } from './routes/auth.route.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 dotenv.config();
 
@@ -14,14 +20,15 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+app.use(cookieParser());
 app.use(express.json());
-app.use('/products', productsRouter);
-app.use('/articles', articlesRouter);
+app.use(passport.initialize());
+app.use('/auth', authRouter);
+app.use('/users', userRouter);
+app.use('/products', productRouter);
+app.use('/articles', articleRouter);
+app.use('/comments', commentRouter);
 
-//전역 에러 핸들러
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: '알 수 없는 에러' });
-});
+app.use(errorHandler); //전역 에러핸들러
 
 app.listen(process.env.PORT || 3000, () => console.log('서버 시작'));
