@@ -30,7 +30,7 @@ export interface CreateCommentRepositoryData {
 }
 
 export interface UpdateCommentData {
-  content?: string;
+  content: string;
 }
 
 // 모든 댓글 조회 (query)
@@ -73,7 +73,6 @@ export const updateComment = {
     .object({
       content: commentContentSchema,
     })
-    .partial()
     .strict(),
 };
 

@@ -28,7 +28,12 @@ export const createProduct = async (req: Request, res: Response) => {
   if (!req.user) throw new Error('사용자 인증이 필요합니다.');
   const userId = req.user.id;
 
-  const data = req.body;
+  if (!req.file) {
+    throw new Error('이미지 파일이 필요합니다.');
+  }
+  const imageUrl = req.file?.path ?? null;
+
+  const data = { ...req.body, imageUrl };
   const product = await productService.createProduct(userId, data);
   return res.status(201).json({ success: true, data: product });
 };
@@ -56,4 +61,33 @@ export const deleteProduct = async (req: Request, res: Response) => {
 
   await productService.deleteProduct(id, userId);
   return res.status(200).json({ success: true, message: '상품이 삭제되었습니다.' });
+};
+
+// 상품 이미지 수정
+export const updateProductImage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) throw new Error('상품 ID가 필요합니다.');
+
+  if (!req.user) throw new Error('사용자 인증이 필요합니다.');
+  const userId = req.user.id;
+
+  if (!req.file) {
+    throw new Error('이미지 파일이 필요합니다.');
+  }
+  const imageUrl = req.file?.path ?? null;
+
+  const product = await productService.updateProductImage(id, userId, imageUrl);
+  return res.json({ success: true, data: product });
+};
+
+// 상품 이미지 삭제
+export const deleteProductImage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) throw new Error('상품 ID가 필요합니다.');
+
+  if (!req.user) throw new Error('사용자 인증이 필요합니다.');
+  const userId = req.user.id;
+
+  await productService.deleteProductImage(id, userId);
+  return res.status(200).json({ success: true, message: '상품 이미지가 삭제되었습니다.' });
 };

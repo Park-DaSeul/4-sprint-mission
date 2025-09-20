@@ -7,6 +7,7 @@ import type {
   CreateProductRepositoryData,
   UpdateProductData,
 } from './products.dto.js';
+import { deleteFile } from '../../utils/index.js';
 
 // 모든 상품 조회
 export const getProducts = async (query: GetProductsQuery, userId: string | null) => {
@@ -42,7 +43,7 @@ export const getProducts = async (query: GetProductsQuery, userId: string | null
 
   // isLiked로 좋아요를 불리언 값으로 변환
   const productsData = products.map((product) => {
-    const isLiked = product.likes ? product.likes.length > 0 : false;
+    const isLiked = product.likes?.length > 0;
     // likes 필드를 제거하고 isLiked 필드를 추가
     const { likes, ...rest } = product;
     return { ...rest, isLiked };
@@ -74,7 +75,7 @@ export const createProduct = async (userId: string, data: CreateProductData) => 
     description,
     price,
     tags,
-    imageUrl: imageUrl ?? null,
+    imageUrl,
     userId,
   };
 
@@ -85,20 +86,24 @@ export const createProduct = async (userId: string, data: CreateProductData) => 
 
 // 상품 수정
 export const updateProduct = async (id: string, userId: string, data: UpdateProductData) => {
-  const { productName, description, price, tags, imageUrl } = data;
+  const { productName, description, price, tags } = data;
 
   // 상품이 존재 확인
   const productData = await productRepository.findProduct(id);
   if (!productData) throw new Error('상품을 찾을 수 없습니다.');
   if (productData.userId !== userId) throw new Error('상품을 수정할 권한이 없습니다.');
 
-  const updateData: UpdateProductData = {
-    ...(productName && { productName }),
-    ...(description && { description }),
-    ...(price && { price }),
-    ...(tags && { tags }),
-    ...(imageUrl && { imageUrl }),
+  // 기존 데이터와 새 데이터 비교
+  const updateData: Partial<UpdateProductData> = {
+    ...(productName !== productData.productName && { productName }),
+    ...(description !== productData.description && { description }),
+    ...(price !== productData.price && { price }),
+    ...(JSON.stringify(tags) !== JSON.stringify(productData.tags) && { tags }),
   };
+
+  if (Object.keys(updateData).length === 0) {
+    throw new Error('수정할 내용이 없습니다.');
+  }
 
   const product = await productRepository.updateProduct(id, updateData);
 
@@ -112,5 +117,57 @@ export const deleteProduct = async (id: string, userId: string) => {
   if (!productData) throw new Error('상품을 찾을 수 없습니다.');
   if (productData.userId !== userId) throw new Error('상품을 삭제할 권한이 없습니다.');
 
-  return await productRepository.deleteProduct(id);
+  await productRepository.deleteProduct(id);
+
+  // DB 업데이트 성공 후 기존 이미지 파일 삭제
+  if (productData.imageUrl) {
+    await deleteFile(productData.imageUrl);
+  }
+
+  return;
+};
+
+// 상품 이미지 수정
+export const updateProductImage = async (id: string, userId: string, imageUrl: string) => {
+  // 상품 존재 확인
+  const productData = await productRepository.findProduct(id);
+  if (!productData) {
+    if (imageUrl) await deleteFile(imageUrl);
+    throw new Error('상품을 찾을 수 없습니다.');
+  }
+  if (productData.userId !== userId) {
+    if (imageUrl) await deleteFile(imageUrl);
+    throw new Error('상품을 수정할 권한이 없습니다.');
+  }
+  if (!imageUrl) throw new Error('수정할 이미지가 없습니다.');
+
+  const updateData = { imageUrl };
+
+  const product = await productRepository.updateProductImage(id, updateData);
+
+  // DB 업데이트 성공 후 기존 이미지 파일 삭제
+  if (productData.imageUrl) {
+    await deleteFile(productData.imageUrl);
+  }
+
+  return product;
+};
+
+// 상품 이미지 삭제
+export const deleteProductImage = async (id: string, userId: string) => {
+  // 상품 존재 확인
+  const productData = await productRepository.findProduct(id);
+  if (!productData) throw new Error('상품을 찾을 수 없습니다.');
+  if (productData.userId !== userId) throw new Error('상품을 수정할 권한이 없습니다.');
+
+  const updateData = { imageUrl: null };
+
+  await productRepository.updateProductImage(id, updateData);
+
+  // DB 업데이트 성공 후 기존 이미지 파일 삭제
+  if (productData.imageUrl) {
+    await deleteFile(productData.imageUrl);
+  }
+
+  return;
 };

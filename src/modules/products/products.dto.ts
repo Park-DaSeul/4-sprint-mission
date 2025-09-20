@@ -6,7 +6,6 @@ import {
   descriptionSchema,
   priceSchema,
   tagsSchema,
-  imageUrlSchema,
   offsetSchema,
   limitSchema,
   orderSchema,
@@ -32,7 +31,7 @@ export interface CreateProductData {
   description: string;
   price: number;
   tags: string[];
-  imageUrl?: string | null;
+  imageUrl: string | null;
 }
 
 export interface CreateProductRepositoryData extends CreateProductData {
@@ -40,11 +39,10 @@ export interface CreateProductRepositoryData extends CreateProductData {
 }
 
 export interface UpdateProductData {
-  productName?: string;
-  description?: string;
-  price?: number;
-  tags?: string[];
-  imageUrl?: string;
+  productName: string;
+  description: string;
+  price: number;
+  tags: string[];
 }
 
 // 모든 상품 조회 (query)
@@ -76,7 +74,6 @@ export const createProduct = {
       description: descriptionSchema,
       price: priceSchema,
       tags: tagsSchema,
-      imageUrl: imageUrlSchema,
     })
     .strict(),
 };
@@ -94,14 +91,30 @@ export const updateProduct = {
       description: descriptionSchema,
       price: priceSchema,
       tags: tagsSchema,
-      imageUrl: imageUrlSchema,
     })
-    .partial()
     .strict(),
 };
 
 // 상품 삭제 (params)
 export const deleteProduct = {
+  params: z
+    .object({
+      id: idSchema,
+    })
+    .strict(),
+};
+
+// 상품 이미지 수정
+export const updateProductImage = {
+  params: z
+    .object({
+      id: idSchema,
+    })
+    .strict(),
+};
+
+// 상품 이미지 삭제
+export const deleteProductImage = {
   params: z
     .object({
       id: idSchema,

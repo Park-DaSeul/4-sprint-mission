@@ -4,8 +4,8 @@ export const asyncHandler = (requestHandler: RequestHandler): RequestHandler => 
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       await requestHandler(req, res, next);
-    } catch (error) {
-      next(error);
+    } catch (err) {
+      next(err);
     }
   };
 };

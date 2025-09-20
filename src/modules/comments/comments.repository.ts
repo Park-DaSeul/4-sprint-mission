@@ -48,7 +48,7 @@ export const createComment = async (createData: CreateCommentRepositoryData) => 
 };
 
 // 댓글 수정
-export const updateComment = async (id: string, updateData: UpdateCommentData) => {
+export const updateComment = async (id: string, updateData: Partial<UpdateCommentData>) => {
   const comment = await prisma.comment.update({
     where: { id },
     data: updateData,

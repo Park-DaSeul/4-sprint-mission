@@ -57,3 +57,32 @@ export const deleteArticle = async (req: Request, res: Response) => {
   await articleService.deleteArticle(id, userId);
   return res.status(200).json({ success: true, message: '게시글이 삭제되었습니다.' });
 };
+
+// 게시글 이미지 수정
+export const updateArticleImage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) throw new Error('게시글 ID가 필요합니다.');
+
+  if (!req.user) throw new Error('사용자 인증이 필요합니다.');
+  const userId = req.user.id;
+
+  if (!req.file) {
+    throw new Error('이미지 파일이 필요합니다.');
+  }
+  const imageUrl = req.file?.path ?? null;
+
+  const article = await articleService.updateArticleImage(id, userId, imageUrl);
+  return res.json({ success: true, data: article });
+};
+
+// 게시글 이미지 삭제
+export const deleteArticleImage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) throw new Error('게시글 ID가 필요합니다.');
+
+  if (!req.user) throw new Error('사용자 인증이 필요합니다.');
+  const userId = req.user.id;
+
+  await articleService.deleteArticleImage(id, userId);
+  return res.status(200).json({ success: true, message: '게시글 이미지가 삭제되었습니다.' });
+};

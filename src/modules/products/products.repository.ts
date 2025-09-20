@@ -64,7 +64,7 @@ export const createProduct = async (createData: CreateProductRepositoryData) => 
 };
 
 // 상품 수정
-export const updateProduct = async (id: string, updateData: UpdateProductData) => {
+export const updateProduct = async (id: string, updateData: Partial<UpdateProductData>) => {
   const product = await prisma.product.update({
     where: { id },
     data: updateData,
@@ -95,6 +95,25 @@ export const deleteProduct = async (id: string) => {
 export const findProduct = async (id: string) => {
   const product = await prisma.product.findUnique({
     where: { id },
+  });
+
+  return product;
+};
+
+// 상품 이미지 수정,삭제
+export const updateProductImage = async (id: string, updateData: { imageUrl: string | null }) => {
+  const product = await prisma.product.update({
+    where: { id },
+    data: updateData,
+    select: {
+      ...productSelect,
+      user: {
+        select: userSelect,
+      },
+      comments: {
+        select: commentSelect,
+      },
+    },
   });
 
   return product;

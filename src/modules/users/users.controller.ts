@@ -30,7 +30,30 @@ export const deleteUser = async (req: Request, res: Response) => {
   return res.status(200).json({ success: true, message: '사용자가 삭제되었습니다.' });
 };
 
-// 사용자가 등록한 상품 목록 조회
+// 사용자 이미지 수정
+export const updateUserImage = async (req: Request, res: Response) => {
+  if (!req.user) throw new Error('사용자 인증이 필요합니다.');
+  const { id } = req.user;
+
+  if (!req.file) {
+    throw new Error('이미지 파일이 필요합니다.');
+  }
+  const imageUrl = req.file?.path ?? null;
+
+  const user = await userService.updateUserImage(id, imageUrl);
+  return res.json({ success: true, data: user });
+};
+
+// 사용자 이미지 삭제
+export const deleteUserImage = async (req: Request, res: Response) => {
+  if (!req.user) throw new Error('사용자 인증이 필요합니다.');
+  const { id } = req.user;
+
+  await userService.deleteUserImage(id);
+  return res.status(200).json({ success: true, message: '사용자 이미지가 삭제되었습니다.' });
+};
+
+// 사용자가 등록한 상품 조회
 export const getUserProducts = async (req: Request, res: Response) => {
   if (!req.user) throw new Error('사용자 인증이 필요합니다.');
   const { id } = req.user;
@@ -39,7 +62,7 @@ export const getUserProducts = async (req: Request, res: Response) => {
   return res.json({ success: true, data: user });
 };
 
-// 사용자가 좋아요 누른 상품 목록 조회
+// 사용자가 좋아요 누른 상품 조회
 export const getUserLikedProducts = async (req: Request, res: Response) => {
   if (!req.user) throw new Error('사용자 인증이 필요합니다.');
   const { id } = req.user;

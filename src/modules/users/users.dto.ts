@@ -1,16 +1,14 @@
 import { z } from 'zod';
-import { nicknameSchema, imageUrlSchema, passwordSchema, emailSchema } from '../../utils/index.js';
+import { nicknameSchema, passwordSchema, emailSchema } from '../../utils/index.js';
 
 export interface UpdateUserData {
-  nickname?: string;
-  imageUrl?: string;
+  nickname: string;
   password: string;
   newPassword?: string;
 }
 
 export interface UpdateUserRepositoryData {
-  nickname?: string;
-  imageUrl?: string;
+  nickname: string;
   password?: string;
 }
 
@@ -24,11 +22,9 @@ export const updateUser = {
     .object({
       email: emailSchema,
       nickname: nicknameSchema,
-      imageUrl: imageUrlSchema,
       newPassword: passwordSchema,
       password: passwordSchema,
     })
-    .partial()
     .strict(),
 };
 

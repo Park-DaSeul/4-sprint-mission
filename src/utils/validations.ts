@@ -53,6 +53,7 @@ export const priceSchema = z.number().nonnegative();
 
 export const tagsSchema = z
   .array(z.string())
+  .max(5, '태그는 최대 5개까지 가능합니다.')
   // 태그 배열의 각 항목에서 공백을 제거하고 빈 문자열을 필터링합니다.
   .transform((tags) => tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0))
   // transform 이후에 배열이 비어있지 않은지 확인합니다.

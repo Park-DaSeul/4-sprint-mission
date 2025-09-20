@@ -7,6 +7,7 @@ import passport from '../../libs/passport/index.js';
 import { nestedCommentRouter } from '../comments/comments.route.js';
 import { nestedArticleLikeRouter } from '../articleLikes/articleLikes.route.js';
 import { optionalAuthenticate } from '../../middlewares/optionalAuth.middleware.js';
+import { articleImageUpload } from '../../middlewares/upload.middleware.js';
 
 const articleRouter = express.Router();
 
@@ -22,7 +23,7 @@ articleRouter.get(
 articleRouter.use(passport.authenticate('access-token', { session: false }));
 
 // 게시글 생성
-articleRouter.post('/', (validate(articleDto.createArticle), asyncHandler(articleController.createArticle)));
+articleRouter.post('/', validate(articleDto.createArticle), asyncHandler(articleController.createArticle));
 
 // 특정 게시글 조회, 수정, 삭제 (/:id)
 articleRouter
@@ -30,6 +31,16 @@ articleRouter
   .get(validate(articleDto.getArticleById), asyncHandler(articleController.getArticleById))
   .put(validate(articleDto.updateArticle), asyncHandler(articleController.updateArticle))
   .delete(validate(articleDto.deleteArticle), asyncHandler(articleController.deleteArticle));
+
+// 게시글 이미지 수정, 삭제
+articleRouter
+  .route('/:id/image')
+  .put(articleImageUpload, validate(articleDto.updateArticleImage), asyncHandler(articleController.updateArticleImage))
+  .delete(
+    articleImageUpload,
+    validate(articleDto.deleteArticleImage),
+    asyncHandler(articleController.deleteArticleImage),
+  );
 
 articleRouter.use('/:articleId/comments', nestedCommentRouter);
 articleRouter.use('/:articleId/articleLikes', nestedArticleLikeRouter);

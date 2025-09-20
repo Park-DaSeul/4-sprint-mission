@@ -13,7 +13,7 @@ export const getUser = async (id: string) => {
 };
 
 // 사용자 수정
-export const updateUser = async (id: string, updateData: UpdateUserRepositoryData) => {
+export const updateUser = async (id: string, updateData: Partial<UpdateUserRepositoryData>) => {
   const user = await prisma.user.update({
     where: { id },
     data: updateData,
@@ -41,6 +41,17 @@ export const findUser = async (id: string) => {
   return user;
 };
 
+// 사용자 이미지 수정, 삭제
+export const updateUserImage = async (id: string, updateData: { imageUrl: string | null }) => {
+  const user = await prisma.user.update({
+    where: { id },
+    data: updateData,
+    select: meSelect,
+  });
+
+  return user;
+};
+
 // 사용자가 등록한 상품 목록 조회
 export const getUserProducts = async (id: string) => {
   const user = await prisma.user.findUnique({
@@ -55,7 +66,7 @@ export const getUserProducts = async (id: string) => {
   return user;
 };
 
-// 사용자가 좋아요 누른 상품 목록조회
+// 사용자가 좋아요 누른 상품 목록 조회
 export const getUserLikedProducts = async (id: string) => {
   const user = await prisma.user.findUnique({
     where: { id },

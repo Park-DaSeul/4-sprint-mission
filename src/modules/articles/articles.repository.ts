@@ -64,7 +64,7 @@ export const createArticle = async (createData: CreateArticleRepositoryData) => 
 };
 
 // 게시글 수정
-export const updateArticle = async (id: string, updateData: UpdateArticleData) => {
+export const updateArticle = async (id: string, updateData: Partial<UpdateArticleData>) => {
   const article = await prisma.article.update({
     where: { id },
     data: updateData,
@@ -93,6 +93,25 @@ export const deleteArticle = async (id: string) => {
 export const findArticle = async (id: string) => {
   const article = await prisma.article.findUnique({
     where: { id },
+  });
+
+  return article;
+};
+
+// 게시글 이미지 수정,삭제
+export const updateArticleImage = async (id: string, updateData: { imageUrl: string | null }) => {
+  const article = await prisma.article.update({
+    where: { id },
+    data: updateData,
+    select: {
+      ...articleSelect,
+      user: {
+        select: userSelect,
+      },
+      comments: {
+        select: commentSelect,
+      },
+    },
   });
 
   return article;

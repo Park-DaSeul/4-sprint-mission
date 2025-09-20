@@ -11,7 +11,7 @@ export const createArticleLike = async (articleId: string, userId: string) => {
     const { id } = existingLike;
     await articleLikeRepository.deleteArticleLike(id);
 
-    return 'canceled';
+    return null;
   }
 
   // 좋아요 생성

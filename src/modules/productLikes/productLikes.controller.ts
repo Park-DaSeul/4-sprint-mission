@@ -12,7 +12,7 @@ export const createProductLike = async (req: Request, res: Response) => {
   const productLike = await productLikeService.createProductLike(productId, userId);
 
   // 좋아요 취소일 경우와 생성일 경우를 삼항 연산자로 처리
-  return typeof productLike === 'string' && productLike === 'canceled'
+  return productLike === null
     ? res.status(200).json({ success: true, message: '좋아요를 취소했습니다.' })
     : res.status(201).json({ success: true, data: productLike });
 };

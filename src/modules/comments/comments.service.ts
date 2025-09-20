@@ -73,9 +73,14 @@ export const updateComment = async (id: string, userId: string, data: UpdateComm
   if (!commentData) throw new Error('댓글을 찾을 수 없습니다.');
   if (commentData.userId !== userId) throw new Error('댓글을 수정할 권한이 없습니다.');
 
-  const updateData: UpdateCommentData = {
-    ...(content && { content }),
+  // 기존 데이터와 새 데이터 비교
+  const updateData: Partial<UpdateCommentData> = {
+    ...(content !== commentData.content && { content }),
   };
+
+  if (Object.keys(updateData).length === 0) {
+    throw new Error('수정할 내용이 없습니다.');
+  }
 
   const comment = await commentRepository.updateComment(id, updateData);
 

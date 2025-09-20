@@ -7,6 +7,8 @@ import passport from '../../libs/passport/index.js';
 import { nestedCommentRouter } from '../comments/comments.route.js';
 import { nestedProductLikeRouter } from '../productLikes/productLikes.route.js';
 import { optionalAuthenticate } from '../../middlewares/optionalAuth.middleware.js';
+import { productImageUpload } from '../../middlewares/upload.middleware.js';
+import { jsonBodyParser } from '../../middlewares/jsonBodyParser.middleware.js';
 
 const productRouter = express.Router();
 
@@ -22,7 +24,13 @@ productRouter.get(
 productRouter.use(passport.authenticate('access-token', { session: false }));
 
 // 상품 생성
-productRouter.post('/', (validate(productDto.createProduct), asyncHandler(productController.createProduct)));
+productRouter.post(
+  '/',
+  productImageUpload,
+  jsonBodyParser,
+  validate(productDto.createProduct),
+  asyncHandler(productController.createProduct),
+);
 
 // 특정 상품 조회, 수정, 삭제 (/:id)
 productRouter
@@ -30,6 +38,16 @@ productRouter
   .get(validate(productDto.getProductById), asyncHandler(productController.getProductById))
   .put(validate(productDto.updateProduct), asyncHandler(productController.updateProduct))
   .delete(validate(productDto.deleteProduct), asyncHandler(productController.deleteProduct));
+
+// 상품 이미지 수정, 삭제
+productRouter
+  .route('/:id/image')
+  .put(productImageUpload, validate(productDto.updateProductImage), asyncHandler(productController.updateProductImage))
+  .delete(
+    productImageUpload,
+    validate(productDto.deleteProductImage),
+    asyncHandler(productController.deleteProductImage),
+  );
 
 productRouter.use('/:productId/comments', nestedCommentRouter);
 productRouter.use('/:productId/productLikes', nestedProductLikeRouter);

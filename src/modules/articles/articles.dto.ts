@@ -4,7 +4,6 @@ import {
   idSchema,
   titleSchema,
   articleContentSchema,
-  imageUrlSchema,
   offsetSchema,
   limitSchema,
   orderSchema,
@@ -28,7 +27,6 @@ export interface GetArticlesRepositoryQuery {
 export interface CreateArticleData {
   title: string;
   content: string;
-  imageUrl?: string | null;
 }
 
 export interface CreateArticleRepositoryData extends CreateArticleData {
@@ -36,9 +34,8 @@ export interface CreateArticleRepositoryData extends CreateArticleData {
 }
 
 export interface UpdateArticleData {
-  title?: string;
-  content?: string;
-  imageUrl?: string;
+  title: string;
+  content: string;
 }
 
 // 모든 게시글 조회 (query)
@@ -68,7 +65,6 @@ export const createArticle = {
     .object({
       title: titleSchema,
       content: articleContentSchema,
-      imageUrl: imageUrlSchema,
     })
     .strict(),
 };
@@ -84,14 +80,30 @@ export const updateArticle = {
     .object({
       title: titleSchema,
       content: articleContentSchema,
-      imageUrl: imageUrlSchema,
     })
-    .partial()
     .strict(),
 };
 
 // 게시글 삭제 (params)
 export const deleteArticle = {
+  params: z
+    .object({
+      id: idSchema,
+    })
+    .strict(),
+};
+
+// 게시글 이미지 수정
+export const updateArticleImage = {
+  params: z
+    .object({
+      id: idSchema,
+    })
+    .strict(),
+};
+
+// 게시글 이미지 삭제
+export const deleteArticleImage = {
   params: z
     .object({
       id: idSchema,

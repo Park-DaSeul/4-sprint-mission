@@ -1,18 +1,9 @@
 import { z } from 'zod';
-import { emailSchema, nicknameSchema, imageUrlSchema, passwordSchema } from '../../utils/index.js';
+import { emailSchema, nicknameSchema, passwordSchema } from '../../utils/index.js';
 
 export interface CreateSignupData {
   email: string;
   nickname: string;
-  imageUrl?: string | null;
-  password: string;
-  confirmPassword: string;
-}
-
-export interface CreateSignupRepositoryData {
-  email: string;
-  nickname: string;
-  imageUrl?: string | null;
   password: string;
 }
 
@@ -31,7 +22,6 @@ export const signup = {
     .object({
       email: emailSchema,
       nickname: nicknameSchema,
-      imageUrl: imageUrlSchema,
       password: passwordSchema,
       confirmPassword: passwordSchema,
     })
