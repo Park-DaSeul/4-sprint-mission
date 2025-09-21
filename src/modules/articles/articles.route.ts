@@ -8,6 +8,7 @@ import { nestedCommentRouter } from '../comments/comments.route.js';
 import { nestedArticleLikeRouter } from '../articleLikes/articleLikes.route.js';
 import { optionalAuthenticate } from '../../middlewares/optionalAuth.middleware.js';
 import { articleImageUpload } from '../../middlewares/upload.middleware.js';
+import { jsonBodyParser } from '../../middlewares/jsonBodyParser.middleware.js';
 
 const articleRouter = express.Router();
 
@@ -23,7 +24,13 @@ articleRouter.get(
 articleRouter.use(passport.authenticate('access-token', { session: false }));
 
 // 게시글 생성
-articleRouter.post('/', validate(articleDto.createArticle), asyncHandler(articleController.createArticle));
+articleRouter.post(
+  '/',
+  articleImageUpload,
+  jsonBodyParser,
+  validate(articleDto.createArticle),
+  asyncHandler(articleController.createArticle),
+);
 
 // 특정 게시글 조회, 수정, 삭제 (/:id)
 articleRouter
