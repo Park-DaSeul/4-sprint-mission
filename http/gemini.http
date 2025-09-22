@@ -46,6 +46,19 @@ POST {{baseUrl}}/auth/logout HTTP/1.1
 # @name getUser
 GET http://localhost:3000/users/me
 
+### 사용자 이미지 테스트
+# @name createUserImage
+PUT http://localhost:3000/users/me/image
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test.png"
+Content-Type: image/png
+
+< ./image/test.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
 ###
 # @name getUserProducts
 GET http://localhost:3000/users/me/products
@@ -86,13 +99,35 @@ Content-Type: application/json
   "tags": ["arewr"]
 }
 
+### 제품 이미지 테스트
+# @name createProductImage
+POST http://localhost:3000/products
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="data"
+Content-Type: application/json
+
+{
+  "productName": "상품생성2",
+  "description": "이건 테스트 시험입니다.",
+  "price": 99.99,
+  "tags": ["arewr"]
+}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test.png"
+Content-Type: image/png
+
+< ./image/test.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
 ###
 # @name getProducts
 GET http://localhost:3000/products
 
 ###
 # @name getProductById
-GET http://localhost:3000/products/f9d15193-7719-4258-b57b-a9b47f3928ef
+GET http://localhost:3000/products/14df33f3-f933-4bbd-9486-22005a3a4c82
 
 ###
 # @name updateProduct
@@ -114,7 +149,7 @@ POST http://localhost:3000/products/f9d15193-7719-4258-b57b-a9b47f3928ef/comment
 Content-Type: application/json
 
 {
-  "content": "이것도 테스트21212"
+  "content": "생성테스트21212"
 }
 
 ### 댓글 테스트
@@ -190,6 +225,19 @@ Content-Type: application/json
 # @name deleteArticle
 # 5. Use the same ID to delete the article.
 DELETE {{baseUrl}}/articles/d957aafa-dafa-4867-9f8d-a336a8dd80ec HTTP/1.1
+
+### 제품 이미지 테스트
+# @name createArticleImage
+PUT http://localhost:3000/articles/85fd1993-ec6a-478d-b4cb-e3124d9548f6/image
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test.png"
+Content-Type: image/png
+
+< ./image/test.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
 
 # =================================================================
 # Products (Example)
