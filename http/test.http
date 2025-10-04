@@ -1,0 +1,310 @@
+# For more info on the REST Client extension, see: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+@baseUrl = http://localhost:3000
+
+# =================================================================
+# Auth
+# =================================================================
+
+### 회원가입
+# @name signup
+POST {{baseUrl}}/auth/signup HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "test1@example.com",
+  "password": "password123",
+  "nickname": "슬이당3"
+}
+
+### 로그인
+# @name login
+POST {{baseUrl}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "password123"
+}
+
+### 토큰 재발급
+# @name refresh
+POST {{baseUrl}}/auth/refresh HTTP/1.1
+Content-Type: application/json
+
+{ 
+}
+
+### 로그아웃
+# @name logout
+POST {{baseUrl}}/auth/logout HTTP/1.1
+
+### 사용자 조회
+# @name getUser
+GET {{baseUrl}}/users/me
+
+### 사용자 이미지 테스트
+# @name userImageUpload
+POST {{baseUrl}}/userImages
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test.png"
+Content-Type: image/png
+
+< ./image/test.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+### 사용자가 등록한 상품 조회
+# @name getUserProduct
+GET {{baseUrl}}/users/me/products
+
+### 사용자가 좋아요 누른 상품 조회
+# @name getUserLike
+GET {{baseUrl}}/users/me/likes
+
+
+### 사용자 수정
+# @name updateUser
+PUT {{baseUrl}}/users/me
+Content-Type: application/json
+
+{
+  "nickname": "슬이당",
+  "password": "password123",
+  "newPassword": "password123",
+  "imageId": "3689617b-2950-453b-a9ed-42b0a6461f54"
+}
+
+### 사용자 삭제
+# @name deleteUser
+DELETE {{baseUrl}}/users/me
+Content-Type: application/json
+
+{
+  "password": "password123"
+}
+
+###################
+### 상품 테스트
+###################
+
+### 상품 생성
+# @name createProduct
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "상품생성2",
+  "description": "이건 테스트 시험입니다.",
+  "price": 99.99,
+  "tags": ["arewr"],
+  "imageIds": [
+    {
+      "id": "68f00e01-d008-4609-9825-273eebb47c96"
+    },
+    {
+      "id": "771cb52f-d90c-49ab-803b-f1fae3beba99"
+    }
+  ]
+}
+
+### 상품 이미지 업로드
+# @name createProductImage
+POST {{baseUrl}}/productImages
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test2.png"
+Content-Type: image/png
+
+< ./image/test2.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+### 모든 상품 조회
+# @name getProducts
+GET {{baseUrl}}/products
+
+### 특정 상품 조회
+# @name getProductById
+GET {{baseUrl}}/products/1b4298aa-9349-4351-b7a8-2195b3c3f56b
+
+### 상품 수정
+# @name updateProduct
+PUT {{baseUrl}}/products/1b4298aa-9349-4351-b7a8-2195b3c3f56b
+Content-Type: application/json
+
+{
+  "name": "상품생성2",
+  "description": "이건 테스트 시험입니다.",
+  "price": 100,
+  "tags": ["수정"]
+}
+
+### 상품 삭제
+# @name deleteProduct
+DELETE {{baseUrl}}/products/01384fc3-0958-47a5-9812-584217e8079c
+
+### 상품 댓글 생성
+# @name createComment
+POST {{baseUrl}}/products/35b281a0-1736-4aeb-8630-4880695bf67d/comments
+Content-Type: application/json
+
+{
+  "content": "웹소켓 생기?"
+}
+
+### 상품 모든 댓글 조회
+# @name getComments
+GET {{baseUrl}}/products/1b4298aa-9349-4351-b7a8-2195b3c3f56b/comments
+
+### 상품 특정 댓글 조회
+# @name getCommentById
+GET {{baseUrl}}/productComments/c0e8a83a-1d6c-4d4a-b387-b230794190ba
+
+### 상품 댓글 수정
+# @name updateComment
+PUT {{baseUrl}}/productComments/c0e8a83a-1d6c-4d4a-b387-b230794190ba
+Content-Type: application/json
+
+{
+  "content": "수정댓글"
+}
+
+### 상품 댓글 삭제
+# @name deleteComment
+DELETE {{baseUrl}}/productComments/c0e8a83a-1d6c-4d4a-b387-b230794190ba
+
+### 상품 좋아요
+# @name createProductLike
+POST {{baseUrl}}/products/1b4298aa-9349-4351-b7a8-2195b3c3f56b/likes
+
+
+##################
+# 게시글 테스트
+####################
+
+# =================================================================
+# Articles (Manual ID Pasting)
+# =================================================================
+
+### 게시글 생성
+# @name createArticle
+POST {{baseUrl}}/articles HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "테스트로 만든다2",
+  "content": "한글로 만들어야지2",
+  "imageIds": [
+    {
+      "id": "d26228c0-11ee-42db-a453-eb6079f0d43d"
+    },
+    {
+      "id": "fe62f1ad-a155-4cc8-a775-5067eb79078d"
+    }
+  ]
+}
+
+### 모든 게시글 조회
+# @name getArticles
+# 3. Paste the copied ID into the URL below and run the request.
+GET {{baseUrl}}/articles
+
+### 특정 게시글 조회
+# @name getArticleById
+# 3. Paste the copied ID into the URL below and run the request.
+GET {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e HTTP/1.1
+
+
+### 게시글 수정
+# @name updateArticle
+# 4. Use the same ID to update the article.
+PUT {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "아티클을 수정하자",
+  "content": "이건 수정된 내용",
+   "imageIds": [
+  {
+      "id": "d26228c0-11ee-42db-a453-eb6079f0d43d"
+    },
+    {
+      "id": "fe62f1ad-a155-4cc8-a775-5067eb79078d"
+    }
+  ]
+}
+
+### 게시글 삭제
+# @name deleteArticle
+DELETE {{baseUrl}}/articles/7d100e09-090d-4e2b-9ff8-b160fb103f11 HTTP/1.1
+
+### 게시글 이미지 업로드
+# @name createArticleImage
+POST {{baseUrl}}/articleImages
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test3.png"
+Content-Type: image/png
+
+< ./image/test3.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 게시글 댓글 생성
+# @name createComment
+POST {{baseUrl}}/articles/4eb3215c-fe55-40d4-9da3-fdd6d42f9d9b/comments
+Content-Type: application/json
+
+{
+  "content": "소켓 2번쨰 가즈아"
+}
+
+### 게시글 모든 댓글 조회
+# @name getComments
+GET {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e/comments
+
+### 특정 게시글 댓글 조회
+# @name getCommentById
+GET {{baseUrl}}/articleComments/a9743caf-01d3-4e22-8a1e-7df6dc015ea0
+
+### 게시글 댓글 수정
+# @name updateComment
+PUT {{baseUrl}}/articleComments/a9743caf-01d3-4e22-8a1e-7df6dc015ea0
+Content-Type: application/json
+
+{
+  "content": "수정1212댓글"
+}
+
+### 게시글 댓글 삭제
+# @name deleteComment
+DELETE {{baseUrl}}/articleComments/a9743caf-01d3-4e22-8a1e-7df6dc015ea0
+
+### 게시글 좋아요
+# @name createProductLike
+POST {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e/likes
+
+##################
+# 알림 테스트
+####################
+
+### 사용자 모든 알림 조회
+# @name getNotifications
+GET {{baseUrl}}/notifications
+
+### 사용자 모든 개수 조회 (안읽음)
+# @name getUnreadCount
+GET {{baseUrl}}/notifications/unreadCount
+
+### 사용자 모든 알림 수정 (읽음)
+# @name updateAllNotification
+PUT {{baseUrl}}/notifications/all
+
+### 사용자 알림 수정 (읽음)
+# @name updateNotification
+PUT {{baseUrl}}/notifications/cd1656f4-c7b6-4bf8-a05d-3949f7a1691a
+

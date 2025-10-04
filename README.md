@@ -1,39 +1,52 @@
 # 🚀 UJU API 서버
 
-스프린트 미션4
+8번째 스프린트 미션을 위해 제작된 API 서버입니다. 이 서버는 상품 및 게시글 관리를 위한 백엔드 서비스를 제공하며, 사용자 인증, 실시간 알림 등 다양한 기능을 포함하고 있습니다.
 
 ## ✨ 주요 기능
 
-- **사용자 인증:** JWT를 사용한 안전한 사용자 회원가입 및 로그인.
-- **상품 관리:** 상품 CRUD 기능.
-- **게시글 관리:** 게시글 CRUD 기능.
-- **댓글 시스템:** 상품 및 게시글에 대한 댓글 추가, 수정, 삭제.
-- **좋아요 시스템:** 사용자는 상품 및 게시글에 좋아요/좋아요 취소를 할 수 있습니다.
-- **마이페이지 시스템:** 사용자가 등록한 상품 목록, 좋아요 누른 상품 목록 조회.
-- **이미지 업로드:** 사용자의 프로필, 상품, 게시글 이미지 업로드.
+- **사용자 인증:** 상태 저장 리프레시 토큰(Stateful Refresh Tokens) 방식을 사용한 안전한 사용자 회원가입 및 로그인.
+- **상품 및 게시글 관리:** 상품 및 게시글에 대한 CRUD(생성, 조회, 수정, 삭제) 기능.
+- **댓글 및 좋아요:** 상품 및 게시글에 대한 댓글과 좋아요 기능.
+- **이미지 업로드:** Cloudinary를 연동하여 사용자 프로필, 상품, 게시글 이미지 업로드.
+- **실시간 알림:** Socket.io를 사용하여 댓글 및 좋아요에 대한 실시간 알림 기능.
+- **마이페이지:** 사용자가 등록한 상품, 좋아요 누른 상품 목록 조회.
+- **주기적 작업:** Cron Job을 사용하여 더미 이미지 파일을 주기적으로 삭제.
 
 ## 🛠️ 사용 기술
 
-- **백엔드:** Node.js, Express.js
-- **데이터베이스:** PostgreSQL (Prisma ORM으로 관리)
+- **백엔드:** Node.js, Express.js, TypeScript
+- **데이터베이스:** PostgreSQL
+- **ORM:** Prisma
 - **인증:** Passport.js (JWT & Local Strategies)
-- **유효성 검사:** zod
-- **파일 업로드:** multer
+- **유효성 검사:** Zod
+- **이미지 처리:** Cloudinary
+- **실시간 통신:** Socket.io
+- **환경 변수 관리:** Dotenv
+- **코드 포맷팅:** Prettier
 
 ## 📂 프로젝트 구조
 
 ```
-/home/seuli/4-sprint-mission/
-├── prisma/              # Prisma 스키마, 마이그레이션
+/
+├── prisma/              # Prisma 스키마, 마이그레이션, 시드 파일
 ├── src/
-│   ├── controllers/     # 요청 핸들러
-│   ├── libs/            # 재사용 가능한 라이브러리 (Prisma 클라이언트, Passport 설정)
-│   ├── middlewares/     # Express 미들웨어 (에러 핸들링, 유효성 검사)
-│   ├── routes/          # API 라우트 정의
-│   ├── services/        # 비즈니스 로직
-│   ├── utils/           # 유틸리티 함수
-│   └── validations/     # 요청 유효성 검사 스키마
-├── .gitignore
+│   ├── common/          # 공통 유효성 검사 및 유틸리티
+│   ├── config/          # CORS, Cloudinary 등 설정 파일
+│   ├── lib/             # Prisma 클라이언트, Passport, Socket.io 등 라이브러리
+│   ├── middlewares/     # Express 미들웨어 (에러 핸들링, 인증, 유효성 검사)
+│   ├── modules/         # 기능별 모듈 (auth, users, products, articles 등)
+│   │   ├── moduleName/
+│   │   │   ├── *.container.ts    # 의존성 주입 컨테이너
+│   │   │   ├── *.controller.ts   # 요청 핸들러
+│   │   │   ├── *.dto.ts          # 데이터 전송 객체 (Zod 스키마)
+│   │   │   ├── *.middleware.ts   # 모듈별 미들웨어
+│   │   │   ├── *.repository.ts   # 데이터베이스 상호작용
+│   │   │   ├── *.router.ts       # API 라우트 정의
+│   │   │   └── *.service.ts      # 비즈니스 로직
+│   ├── routes/          # 메인 라우터
+│   ├── types/           # 타입 정의
+│   └── utils/           # 유틸리티 함수 (asyncHandler, errorClass)
+├── .env.sample          # 환경 변수 샘플 파일
 ├── package.json
 └── README.md
 ```
@@ -44,7 +57,7 @@
 
 - Node.js (v18 이상 권장)
 - npm
-- PostgreSQL
+- PostgreSQL 데이터베이스
 
 ### 설치 및 설정
 
@@ -62,87 +75,120 @@
     ```
 
 3.  **환경 변수 설정:**
-
-    루트 디렉토리에 `.env` 파일을 생성하고 다음 변수를 추가하세요. 플레이스홀더 값을 실제 데이터베이스 정보로 교체해야 합니다.
+    `.env.sample` 파일을 복사하여 `.env` 파일을 생성하고, 아래 내용을 자신의 환경에 맞게 수정하세요.
 
     ```env
+    # 서버 포트
+    PORT=3000
+
+    # 데이터베이스 URL
     DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
-    JWT_ACCESS_TOKEN_SECRET="YOUR_JWT_SECRET"
-    JWT_REFRESH_TOKEN_SECRET="YOUR_JWT_SECRET"
+
+    # JWT 비밀 키
+    JWT_ACCESS_TOKEN_SECRET="YOUR_ACCESS_TOKEN_SECRET"
+    JWT_REFRESH_TOKEN_SECRET="YOUR_REFRESH_TOKEN_SECRET"
+
+    # Cloudinary 설정
+    CLOUDINARY_CLOUD_NAME="YOUR_CLOUD_NAME"
+    CLOUDINARY_API_KEY="YOUR_API_KEY"
+    CLOUDINARY_API_SECRET="YOUR_API_SECRET"
     ```
 
-4.  **데이터베이스 마이그레이션 실행:**
+4.  **데이터베이스 마이그레이션:**
+
     ```bash
-    npx prisma migrate depoly
+    npx prisma migrate deploy
     ```
 
-## 🚀 사용법
+5.  **(선택) 데이터베이스 시딩:**
+    ```bash
+    npx prisma db seed
+    ```
 
-개발 서버를 시작합니다:
+### 실행
 
-```bash
-npm run build
-npm run start
-```
+- **개발 모드:**
+  ```bash
+  npm run dev
+  ```
+- **프로덕션 모드:**
+  ```bash
+  npm run build
+  npm run start
+  ```
 
-서버는 `http://localhost:3000` (또는 환경에 지정된 포트)에서 시작됩니다.
+서버는 `.env` 파일에 지정된 포트(기본값: 3000)에서 시작됩니다.
 
 ## 📝 API 엔드포인트
 
-사용 가능한 API 엔드포인트에 대한 간략한 개요입니다. 더 자세한 예시는 `http/` 디렉토리를 참조하세요.
+### REST API (HTTP)
+
+VS Code의 REST Client 확장 프로그램을 사용하면 `http/test.http` 파일로 모든 API를 간편하게 테스트할 수 있습니다.
+
+1.  VS Code에서 `REST Client` 확장 프로그램을 설치합니다.
+2.  `http/test.http` 파일을 엽니다.
+3.  `@login` 요청을 먼저 보내 토큰을 발급받습니다. (REST Client가 자동으로 토큰을 변수에 저장합니다.)
+4.  테스트하고 싶은 다른 API 요청 상단의 `Send Request` 버튼을 클릭하여 실행합니다.
+
+### WebSocket API (실시간 알림)
+
+`scripts/test.websocket.ts` 스크립트를 사용하여 실시간 알림 기능을 테스트할 수 있습니다.
+
+1.  `scripts/test.websocket.ts` 파일의 `ACCESS_TOKEN` 변수에 유효한 사용자 액세스 토큰을 붙여넣습니다.
+2.  터미널에서 아래 명령어를 실행합니다.
+    ```bash
+    npm run test:websocket
+    ```
+3.  이제 해당 사용자와 관련된 활동(예: 내 상품에 다른 사용자가 댓글 작성)이 발생하면, 스크립트를 실행한 터미널에 실시간으로 알림이 출력됩니다.
 
 ### 인증 (Auth)
 
-- `POST /auth/signup`: 새 사용자 등록.
-- `POST /auth/login`: 사용자 로그인 및 JWT 토큰 발급.
-- `POST /auth/logout`: 사용자 로그아웃.
-- `POST /auth/refresh`: JWT 토큰 갱신.
+- `POST /auth/signup`: 회원가입
+- `POST /auth/login`: 로그인
+- `POST /auth/logout`: 로그아웃
+- `POST /auth/refresh`: 토큰 재발급
 
 ### 사용자 (Users)
 
-- `GET /users/me/products`: 현재 사용자가 등록한 상품 가져오기.
-- `GET /users/me/likess`: 현재 사용자가 좋아요한 상품 가져오기.
+- `GET /users/me`: 내 정보 조회
+- `PUT /users/me`: 내 정보 수정
+- `DELETE /users/me`: 회원 탈퇴
+- `GET /users/me/products`: 내가 등록한 상품 조회
+- `GET /users/me/likes`: 내가 좋아요 누른 상품 조회
+- `POST /userImages`: 사용자 프로필 이미지 업로드/수정
 
 ### 상품 (Products)
 
-- `GET /products`: 상품 목록 가져오기.
-- `POST /products`: 새 상품 생성 (인증 필요).
-- `GET /products/:productId`: 단일 상품 가져오기 (인증 필요).
-- `PUT /products/:productId`: 상품 정보 수정 (인증 필요).
-- `DELETE /products/:productId`: 상품 삭제 (인증 필요).
-
-### 상품 댓글 & 좋아요
-
-- `POST /products/:productId/comments`: 상품에 댓글 추가.
-- `PUT /comments/:commentId`: 댓글 수정.
-- `DELETE /comments/:commentId`: 댓글 삭제.
-- `POST /products/:productId/like`: 상품 좋아요/좋아요 취소.
+- `GET /products`: 상품 목록 조회
+- `POST /products`: 상품 생성
+- `GET /products/:id`: 상품 상세 조회
+- `PUT /products/:id`: 상품 수정
+- `DELETE /products/:id`: 상품 삭제
+- `POST /productImages`: 상품 이미지 업로드/수정
 
 ### 게시글 (Articles)
 
-- `GET /articles`: 게시글 목록 가져오기.
-- `POST /articles`: 새 게시글 생성 (인증 필요).
-- `GET /articles/:articleId`: 단일 게시글 가져오기 (인증 필요).
-- `PUT /articles/:articleId`: 게시글 정보 수정 (인증 필요).
-- `DELETE /articles/:articleId`: 게시글 삭제 (인증 필요).
+- `GET /articles`: 게시글 목록 조회
+- `POST /articles`: 게시글 생성
+- `GET /articles/:id`: 게시글 상세 조회
+- `PUT /articles/:id`: 게시글 수정
+- `DELETE /articles/:id`: 게시글 삭제
+- `POST /articleImages`: 게시글 이미지 업로드/수정
 
-### 게시글 댓글 & 좋아요
+### 댓글 (Comments)
 
-- `POST /articles/:articleId/comments`: 게시글에 댓글 추가.
-- `PUT /comments/:commentId`: 댓글 수정.
-- `DELETE /comments/:commentId`: 댓글 삭제.
-- `POST /articles/:articleId/like`: 게시글 좋아요/좋아요 취소.
+- `POST /products/:productId/comments`: 상품에 댓글 작성
+- `POST /articles/:articleId/comments`: 게시글에 댓글 작성
+- `PUT /productComments/:id` 또는 `PUT /articleComments/:id`: 댓글 수정
+- `DELETE /productComments/:id` 또는 `DELETE /articleComments/:id`: 댓글 삭제
 
-## 🤝 기여 방법
+### 좋아요 (Likes)
 
-기여를 환영합니다! 언제든지 Pull Request를 제출해주세요.
+- `POST /products/:productId/likes`: 상품 좋아요/취소
+- `POST /articles/:articleId/likes`: 게시글 좋아요/취소
 
-1.  저장소를 Fork 하세요.
-2.  기능 브랜치를 생성하세요 (`git checkout -b feature/AmazingFeature`).
-3.  변경 사항을 커밋하세요 (`git commit -m 'Add some AmazingFeature'`).
-4.  브랜치에 푸시하세요 (`git push origin feature/AmazingFeature`).
-5.  Pull Request를 생성하세요.
+### 알림 (Notifications)
 
-## 📄 라이선스
-
-이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다.
+- `GET /notifications`: 내 알림 목록 조회
+- `PATCH /notifications/:id/read`: 알림 읽음 처리
+- `DELETE /notifications/read`: 읽은 알림 모두 삭제
