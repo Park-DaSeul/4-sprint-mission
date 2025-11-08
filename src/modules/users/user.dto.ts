@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AuthenticatedRequest } from '../../middlewares/auth.middleware.js';
+import type { AuthenticatedRequest } from '../../types/request.type.js';
 
 // -----------------
 // |  TYPE & DATA  |

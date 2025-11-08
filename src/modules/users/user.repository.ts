@@ -48,11 +48,9 @@ export class UserRepository {
 
   // 사용자 삭제
   public deleteUser = async (id: string) => {
-    const user = await this.prisma.user.delete({
+    return await this.prisma.user.delete({
       where: { id },
     });
-
-    return user;
   };
 
   // 사용자가 등록한 상품 목록 조회
@@ -89,6 +87,7 @@ export class UserRepository {
       select: {
         productLikes: {
           select: {
+            id: true,
             product: {
               select: {
                 id: true,

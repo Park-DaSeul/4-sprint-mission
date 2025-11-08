@@ -22,7 +22,12 @@ nestedArticleCommentRouter.use(authenticate);
 // 게시글 모든 댓글 조회, 댓글 생성
 nestedArticleCommentRouter
   .route('/')
-  .get(validateArticleId, validateGetQuery, asyncHandler(articleCommentController.getArticleComments))
+  .get(
+    validateArticleId,
+    validateGetQuery,
+    checkArticleExists,
+    asyncHandler(articleCommentController.getArticleComments),
+  )
   .post(
     validateArticleId,
     validateCreateBody,

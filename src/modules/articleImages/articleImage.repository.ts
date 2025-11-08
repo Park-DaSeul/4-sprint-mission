@@ -5,11 +5,11 @@ export class ArticleImageRepository {
 
   // 게시글 사진 생성 (업로드)
   public createArticleImage = async (createData: Prisma.ArticleImageCreateInput) => {
-    const image = await this.prisma.articleImage.create({
+    const articleImage = await this.prisma.articleImage.create({
       data: createData,
       select: { id: true },
     });
 
-    return image;
+    return articleImage;
   };
 }

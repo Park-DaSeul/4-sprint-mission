@@ -1,10 +1,10 @@
 import { ProductRepository } from './product.repository.js';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, Product } from '@prisma/client';
 import type { CreateProductBody, UpdateProductBody } from './product.dto.js';
 import type { OffsetQuery } from '../../common/index.js';
-import type { Product } from '@prisma/client';
 import { NotificationService } from '../notifications/notification.service.js';
 import type { CreateNotificationBody } from '../notifications/notification.dto.js';
+import { NotFoundError, BadRequestError } from '../../utils/errorClass.js';
 
 export class ProductService {
   constructor(
@@ -73,7 +73,7 @@ export class ProductService {
   // 특정 상품 조회
   public getProductById = async (id: string, userId: string) => {
     const product = await this.productRepository.getProductById(id, userId);
-    if (!product) throw new Error('상품을 찾을 수 없습니다.');
+    if (!product) throw new NotFoundError('상품을 찾을 수 없습니다.');
 
     // 데이터 가공
     // isLiked로 좋아요를 불리언 값으로 변환
@@ -121,7 +121,7 @@ export class ProductService {
     };
 
     if (Object.keys(updateData).length === 0) {
-      throw new Error('수정할 내용이 없습니다.');
+      throw new BadRequestError('수정할 내용이 없습니다.');
     }
 
     const product = await this.productRepository.updateProduct(id, updateData);

@@ -11,6 +11,11 @@ export class ArticleLikeRepository {
         id: true,
         createdAt: true,
         updatedAt: true,
+        user: {
+          select: {
+            id: true,
+          },
+        },
         article: {
           select: {
             id: true,

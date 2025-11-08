@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client';
+import { config } from '../config/config.js';
 
-const globalForPrisma = globalThis;
+// PrismaClient 인스턴스를 전역적으로 관리하여 핫 리로딩 시 새로운 인스턴스 생성을 방지
+// 개발 환경에서만 전역 변수를 사용하고, 프로덕션 환경에서는 직접 인스턴스를 생성
+const prisma = global.prisma || new PrismaClient();
 
-// 개발환경(핫리로드)에서 Prisma Client가 여러번 생성되지 않게 처리
-const prisma = globalForPrisma.prisma || new PrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
+if (config.NODE_ENV !== 'production') {
+  global.prisma = prisma;
 }
 
 export default prisma;

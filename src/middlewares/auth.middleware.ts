@@ -3,14 +3,6 @@ import type { Request, Response, NextFunction } from 'express';
 import { UnauthorizedError } from '../utils/errorClass.js';
 import type { User } from '@prisma/client';
 
-export interface AuthenticatedRequest extends Request {
-  user: User;
-}
-
-export interface OptionalAuthRequest extends Request {
-  user?: User;
-}
-
 // 인증
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate('access-token', { session: false }, (err: Error, user: User | false, _info: object) => {
@@ -20,7 +12,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     if (!user) {
       return next(new UnauthorizedError('인증이 필요합니다.'));
     }
-    (req as AuthenticatedRequest).user = user;
+    req.user = user;
     return next();
   })(req, res, next);
 };
@@ -32,14 +24,16 @@ export const optionalAuthenticate = (req: Request, res: Response, next: NextFunc
       return next(err);
     }
     if (user) {
-      (req as AuthenticatedRequest).user = user;
+      req.user = user;
     }
     return next();
   })(req, res, next);
 };
 
 // 로그인
-export const localAuthenticate = passport.authenticate('local', { session: false });
+export const localAuthenticate = (req: Request, res: Response, next: NextFunction) =>
+  passport.authenticate('local', { session: false })(req, res, next);
 
 // 토큰 재발급
-export const refreshTokenAuthenticate = passport.authenticate('refresh-token', { session: false });
+export const refreshTokenAuthenticate = (req: Request, res: Response, next: NextFunction) =>
+  passport.authenticate('refresh-token', { session: false })(req, res, next);

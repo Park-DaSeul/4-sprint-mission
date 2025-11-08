@@ -1,10 +1,10 @@
 import { ArticleCommentRepository } from './articleComment.repository.js';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, ArticleComment } from '@prisma/client';
 import type { CreateArticleCommentBody, UpdateArticleCommentBody } from './articleComment.dto.js';
 import type { CursorQuery } from '../../common/index.js';
-import type { ArticleComment } from '@prisma/client';
 import { NotificationService } from '../notifications/notification.service.js';
 import type { CreateNotificationBody } from '../notifications/notification.dto.js';
+import { NotFoundError, BadRequestError } from '../../utils/errorClass.js';
 
 export class ArticleCommentService {
   constructor(
@@ -35,7 +35,7 @@ export class ArticleCommentService {
       take,
       skip: cursor ? 1 : 0,
       ...(cursor && { cursor: { id: cursor } }),
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     };
 
     const articleComments = await this.articleCommentRepository.getArticleComments(getQuery);
@@ -54,7 +54,7 @@ export class ArticleCommentService {
   // 게시글 특정 댓글 조회
   public getArticleCommentById = async (id: string) => {
     const articleComment = await this.articleCommentRepository.getArticleCommentById(id);
-    if (!articleComment) throw new Error('댓글을 찾을 수 없습니다.');
+    if (!articleComment) throw new NotFoundError('댓글을 찾을 수 없습니다.');
 
     return articleComment;
   };
@@ -100,7 +100,7 @@ export class ArticleCommentService {
     };
 
     if (Object.keys(updateData).length === 0) {
-      throw new Error('수정할 내용이 없습니다.');
+      throw new BadRequestError('수정할 내용이 없습니다.');
     }
 
     const articleComment = await this.articleCommentRepository.updateArticleComment(id, updateData);

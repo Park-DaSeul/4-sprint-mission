@@ -22,7 +22,12 @@ nestedProductCommentRouter.use(authenticate);
 // 상품 모든 댓글 조회, 댓글 생성
 nestedProductCommentRouter
   .route('/')
-  .get(validateProductId, validateGetQuery, asyncHandler(productCommentController.getProductComments))
+  .get(
+    validateProductId,
+    validateGetQuery,
+    checkProductExists,
+    asyncHandler(productCommentController.getProductComments),
+  )
   .post(
     validateProductId,
     validateCreateBody,

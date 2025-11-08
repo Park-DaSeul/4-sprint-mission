@@ -4,6 +4,7 @@ import type { SignupBody } from './auth.dto.js';
 import { hashPassword } from '../../common/index.js';
 import { generateTokens } from '../../lib/token.js';
 import type { Tokens } from '../../lib/token.js';
+import { ConflictError } from '../../utils/errorClass.js';
 
 export class AuthService {
   constructor(private authRepository: AuthRepository) {}
@@ -14,7 +15,7 @@ export class AuthService {
 
     // 이메일 중복 확인
     const existingUser = await this.authRepository.checkUserExistsByEmail(email);
-    if (existingUser) throw new Error('이미 사용 중인 이메일입니다.');
+    if (existingUser) throw new ConflictError('이미 사용 중인 이메일입니다.');
 
     // 비밀번호 해시 처리
     const hashedPassword = await hashPassword(password);

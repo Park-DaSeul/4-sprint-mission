@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AuthenticatedRequest, OptionalAuthRequest } from '../../middlewares/auth.middleware.js';
+import type { AuthenticatedRequest, OptionalAuthRequest } from '../../types/request.type.js';
 import type { IdParams, OffsetQuery } from '../../common/index.js';
 import type { Product } from '@prisma/client';
 

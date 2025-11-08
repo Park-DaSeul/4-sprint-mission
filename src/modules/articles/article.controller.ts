@@ -46,7 +46,7 @@ export class ArticleController {
 
     const resource = req.resource;
 
-    const data = req.body;
+    const data = req.parsedBody;
     const article = await this.articleService.updateArticle(id, data, resource);
     return res.status(200).json({ success: true, data: article });
   };
