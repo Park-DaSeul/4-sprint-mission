@@ -1,39 +1,43 @@
-import * as authService from './auth.service.js';
+import { AuthService } from './auth.service.js';
 import type { Request, Response } from 'express';
-import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../../libs/constants.js';
-import { tokensAndSetCookies } from '../../utils/auth.js';
+import type { SignupRequest, LoginRequest, RefreshRequest } from './auth.dto.js';
+import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../../lib/constants.js';
+import { tokensAndSetCookies } from '../../common/index.js';
 
-// 회원가입
-export const signup = async (req: Request, res: Response) => {
-  const data = req.body;
-  const user = await authService.signup(data);
-  return res.status(201).json({ success: true, data: user });
-};
+export class AuthController {
+  constructor(private authService: AuthService) {}
 
-// 로그인
-export const login = async (req: Request, res: Response) => {
-  if (!req.user) throw new Error('사용자 인증이 필요합니다.');
-  const userId = req.user.id;
+  // 회원가입
+  public signup = async (req: SignupRequest, res: Response) => {
+    const data = req.parsedBody;
 
-  const { accessToken, refreshToken } = authService.login(userId);
-  tokensAndSetCookies(res, accessToken, refreshToken);
-  return res.status(200).json({ success: true });
-};
+    const user = await this.authService.signup(data);
+    return res.status(201).json({ success: true, data: user });
+  };
 
-// 토큰 재발급
-export const refresh = (req: Request, res: Response) => {
-  if (!req.user) throw new Error('사용자 인증이 필요합니다.');
-  const userId = req.user.id;
+  // 로그인
+  public login = async (req: LoginRequest, res: Response) => {
+    const userId = req.user.id;
 
-  const { accessToken, refreshToken } = authService.refresh(userId);
-  tokensAndSetCookies(res, accessToken, refreshToken);
-  return res.status(200).json({ success: true });
-};
+    const { accessToken, refreshToken } = this.authService.login(userId);
+    tokensAndSetCookies(res, accessToken, refreshToken);
+    return res.status(200).json({ success: true });
+  };
 
-// 로그아웃
-export const logout = (_req: Request, res: Response) => {
-  res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
-  res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
+  // 토큰 재발급
+  public refresh = async (req: RefreshRequest, res: Response) => {
+    const userId = req.user.id;
 
-  return res.status(200).json({ success: true, message: '로그아웃 되었습니다.' });
-};
+    const { accessToken, refreshToken } = this.authService.refresh(userId);
+    tokensAndSetCookies(res, accessToken, refreshToken);
+    return res.status(200).json({ success: true });
+  };
+
+  // 로그아웃
+  public logout = async (_req: Request, res: Response) => {
+    res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
+    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
+
+    return res.status(200).json({ success: true, message: '로그아웃 되었습니다.' });
+  };
+}

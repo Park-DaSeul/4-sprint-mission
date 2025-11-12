@@ -1,21 +1,29 @@
-import prisma from '../../libs/prisma.js';
-import { meSelect } from '../../utils/index.js';
-import type { CreateSignupData } from './auth.dto.js';
+import type { Prisma, PrismaClient } from '@prisma/client';
 
-// 회원 가입
-export const signup = async (createData: CreateSignupData) => {
-  const user = await prisma.user.create({
-    data: createData,
-    select: meSelect,
-  });
-  return user;
-};
+export class AuthRepository {
+  constructor(private prisma: PrismaClient) {}
 
-// 이메일 중복 확인
-export const checkUserExistsByEmail = async (email: string) => {
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
+  // 회원가입
+  public signup = async (createData: Prisma.UserCreateInput) => {
+    const user = await this.prisma.user.create({
+      data: createData,
+      select: {
+        id: true,
+        nickname: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return user;
+  };
 
-  return user;
-};
+  // 이메일 중복 확인
+  public checkUserExistsByEmail = async (email: string) => {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    return user;
+  };
+}

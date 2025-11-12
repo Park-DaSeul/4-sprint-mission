@@ -1,11 +1,13 @@
-import type { RequestHandler, Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
 
-export const asyncHandler = (requestHandler: RequestHandler): RequestHandler => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+export const asyncHandler = <TReq extends Request>(
+  requestHandler: (req: TReq, res: Response, next: NextFunction) => Promise<any>,
+): RequestHandler => {
+  return async (req, res, next) => {
     try {
-      await requestHandler(req, res, next);
-    } catch (err) {
-      next(err);
+      await requestHandler(req as TReq, res, next);
+    } catch (error) {
+      next(error);
     }
   };
 };

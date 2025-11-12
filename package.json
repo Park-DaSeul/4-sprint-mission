@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "main": "src/app.js",
   "type": "module",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "scripts": {
     "format": "prettier --write .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/app.ts",
+    "dev": "nodemon --exec tsx src/app.ts",
     "start": "node dist/app.js",
-    "build": "tsc"
+    "build": "tsc",
+    "test:websocket": "ts-node scripts/test.websocket.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +21,7 @@
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
     "@types/bcrypt": "^6.0.0",
+    "@types/busboy": "^1.5.4",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/multer": "^2.0.0",
@@ -26,22 +31,28 @@
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "prisma": "^6.13.0",
+    "socket.io-client": "^4.8.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.2"
   },
   "dependencies": {
     "@prisma/client": "^6.13.0",
     "@types/express": "^5.0.3",
     "bcrypt": "^6.0.0",
+    "busboy": "^1.6.0",
+    "cloudinary": "^2.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
+    "node-cron": "^4.2.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
+    "socket.io": "^4.8.1",
     "zod": "^4.0.15"
   }
 }

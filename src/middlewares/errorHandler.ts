@@ -1,10 +1,27 @@
-import { Prisma } from '@prisma/client';
 import type { Request, Response, NextFunction } from 'express';
+import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
+import { HttpError } from '../utils/errorClass.js';
 
 //전역 에러핸들러
 export const errorHandler = (err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err); // 모든 에러를 일단 로그로 남깁니다.
+
+  // HttpError 에러 처리 (커스텀 에러)
+  if (err instanceof HttpError) {
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: 'error',
+        message: err.message,
+      });
+    }
+
+    console.error(`PROGRAMMING ERROR [${err.name}]:`, err);
+    return res.status(500).json({
+      status: 'error',
+      message: '서버 내부에서 예상치 못한 오류가 발생했습니다.',
+    });
+  }
 
   // Zod 에러 처리
   if (err instanceof ZodError) {
@@ -35,6 +52,7 @@ export const errorHandler = (err: unknown, _req: Request, res: Response, _next: 
       // 다른 Prisma 에러 코드에 대한 케이스를 추가할 수 있습니다.
       default:
         // 처리되지 않은 다른 Prisma 에러
+        console.error(`DATABASE ERROR [${err.code}]:`, err);
         return res.status(500).json({
           error: 'Database Error',
           message: '데이터베이스 작업 중 오류가 발생했습니다.',
@@ -54,6 +72,8 @@ export const errorHandler = (err: unknown, _req: Request, res: Response, _next: 
   }
 
   // 알 수 없는 에러 처리
+
+  console.error('UNHANDLED SERVER ERROR:', err);
   return res.status(500).json({
     error: 'Internal Server Error',
     message: '서버에서 알 수 없는 오류가 발생했습니다.',

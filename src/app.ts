@@ -2,34 +2,38 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import passport from './libs/passport/index.js';
-import { userRouter } from './modules/users/users.route.js';
-import { productRouter } from './modules/products/products.route.js';
-import { articleRouter } from './modules/articles/articles.route.js';
-import { commentRouter } from './modules/comments/comments.route.js';
-import { authRouter } from './modules/auth/auth.route.js';
+import http from 'http';
+import { initSocket } from './lib/socket.js';
+import passport from './lib/passport/index.js';
+import { mainRouter } from './routes/mainRouter.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { startCleanupJob } from './lib/cron-jobs.js';
+import { corsOptions } from './config/cors.config.js';
+import { configureCloudinary } from './config/cloudinary.config.js';
 
 dotenv.config();
 
 const app = express();
+//웹소켓 설정
+const server = http.createServer(app);
+initSocket(server);
 
-//cors 설정
-const corsOptions = {
-  origin: ['http://127.0.0.1:3000', 'http://localhost:5173'],
-};
+// cors 설정
 app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
+
+// Cloudinary 환경 설정
+configureCloudinary();
+
 app.use(passport.initialize());
-app.use('/auth', authRouter);
-app.use('/users', userRouter);
-app.use('/products', productRouter);
-app.use('/articles', articleRouter);
-app.use('/comments', commentRouter);
 
-app.use(errorHandler); //전역 에러핸들러
+app.use(mainRouter);
 
-app.listen(process.env.PORT || 3000, () => console.log('서버 시작'));
+// Cron Job 활성화
+startCleanupJob();
+
+app.use(errorHandler);
+
+server.listen(process.env.PORT || 3000, () => console.log('서버 시작'));

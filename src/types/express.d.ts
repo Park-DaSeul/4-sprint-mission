@@ -1,18 +1,5 @@
-import { User as PrismaUser } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 declare global {
-  namespace Express {
-    interface User extends PrismaUser {}
-
-    interface Request {
-      user?: User;
-      resourceType?: 'ARTICLE' | 'PRODUCT';
-      resourceId?: string;
-      validatedData?: {
-        body?: unknown;
-        query?: unknown;
-        params?: unknown;
-      };
-    }
-  }
+  var prisma: PrismaClient;
 }

@@ -1,44 +1,63 @@
 import { z } from 'zod';
-import { emailSchema, nicknameSchema, passwordSchema } from '../../utils/index.js';
+import type { Request } from 'express';
+import type { AuthenticatedRequest } from '../../middlewares/auth.middleware.js';
 
-export interface CreateSignupData {
-  email: string;
-  nickname: string;
-  password: string;
+// ----------
+// |  TYPE  |
+// ----------
+
+// 회원가입
+export interface SignupRequest extends Request {
+  parsedBody: SignupBody;
 }
 
-export interface LoginData {
-  email: string;
-  password: string;
+// 로그인
+export interface LoginRequest extends AuthenticatedRequest {
+  parsedBody: LoginBody;
 }
 
-export interface RefreshData {
-  refreshToken: string;
+// 토큰 재발급
+export interface RefreshRequest extends AuthenticatedRequest {
+  parsedBody: RefreshBody;
 }
 
-// 회원가입 (body)
-export const signup = {
-  body: z
-    .object({
-      email: emailSchema,
-      nickname: nicknameSchema,
-      password: passwordSchema,
-      confirmPassword: passwordSchema,
-    })
-    .strict(),
-};
+// -----------------
+// |  ZOD SCHEMAS  |
+// -----------------
 
-// 로그인 (body)
-export const login = {
-  body: z
-    .object({
-      email: emailSchema,
-      password: passwordSchema,
-    })
-    .strict(),
-};
+// auth
+const nicknameSchema = z
+  .string()
+  .min(1, '닉네임은 최소 1글자 이상이어야 합니다.')
+  .max(20, '닉네임은 최대 20글자까지 가능합니다.');
+const emailSchema = z.email('올바른 이메일 형식이 아닙니다.');
+const passwordSchema = z
+  .string()
+  .min(6, '비밀번호는 최소 6자리 이상이어야 합니다.')
+  .max(20, '비밀번호는 최대 20자리까지 가능합니다.');
 
-// 토큰 재발급 (body)
-export const refresh = {
-  body: z.object({}).strict(),
-};
+// 회원가입
+export const signup = z
+  .object({
+    nickname: nicknameSchema,
+    email: emailSchema,
+    password: passwordSchema,
+  })
+  .strict();
+
+export type SignupBody = z.infer<typeof signup>;
+
+// 로그인
+export const login = z
+  .object({
+    email: emailSchema,
+    password: passwordSchema,
+  })
+  .strict();
+
+export type LoginBody = z.infer<typeof login>;
+
+// 토큰 재발급
+export const refresh = z.object({}).strict();
+
+export type RefreshBody = z.infer<typeof refresh>;
