@@ -1,6 +1,7 @@
 import { ProductService } from '../../../src/modules/products/product.service.js';
 import { ProductRepository } from '../../../src/modules/products/product.repository.js';
 import { NotificationService } from '../../../src/modules/notifications/notification.service.js';
+import * as s3 from '../../../src/lib/s3-service.js';
 import { vi } from 'vitest';
 
 // 가짜(mock) 객체 생성
@@ -32,6 +33,16 @@ describe('ProductService 유닛 테스트', () => {
     userId: userId,
     createdAt: new Date(),
     updatedAt: new Date(),
+    productImages: [
+      {
+        id: 'image-id-1',
+        fileUrl: 'https://fake-url.com/image-1.png',
+        key: 'image-1.png',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        productId: productId,
+      },
+    ],
   };
 
   // 테스트 케이스가 실행되기 전에 매번 실행
@@ -171,16 +182,22 @@ describe('ProductService 유닛 테스트', () => {
         description: '테스트 설명',
         price: 1000,
         tags: ['태그1', '태그2'],
-        imageIds: [{ id: 'image-1' }],
+        imageKeys: ['image-1.png'],
       };
       const mockCreatedProduct = {
         id: productId,
         ...data,
       };
+      const fileUrl = `https://fake-url.com/${data.imageKeys[0]}}`;
+
       mockProductRepository.createProduct.mockResolvedValue(mockCreatedProduct);
+      const permanentKeySpy = vi.spyOn(s3, 'moveFileToPermanent').mockResolvedValue(data.imageKeys[0]);
+      const fileUrlSpy = vi.spyOn(s3, 'getFileUrl').mockReturnValue(fileUrl);
 
       // --- 실행 (Act) ---
       const result = await productService.createProduct(userId, data);
+
+      const imagesData = [{ key: data.imageKeys[0], fileUrl }];
 
       const createData = {
         name: data.name,
@@ -191,13 +208,17 @@ describe('ProductService 유닛 테스트', () => {
           connect: { id: userId },
         },
         productImages: {
-          connect: data.imageIds,
+          create: imagesData,
         },
       };
 
       // --- 검증 (Assert) ---
       expect(mockProductRepository.createProduct).toHaveBeenCalledTimes(1);
       expect(mockProductRepository.createProduct).toHaveBeenCalledWith(createData);
+      expect(permanentKeySpy).toHaveBeenCalledTimes(1);
+      expect(permanentKeySpy).toHaveBeenCalledWith(data.imageKeys[0], 'products');
+      expect(fileUrlSpy).toHaveBeenCalledTimes(1);
+      expect(fileUrlSpy).toHaveBeenCalledWith(data.imageKeys[0]);
       expect(result).toEqual(mockCreatedProduct);
     });
   });

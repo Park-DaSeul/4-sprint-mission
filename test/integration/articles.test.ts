@@ -4,7 +4,21 @@ import { app } from '../../src/app.js';
 import prisma from '../../src/lib/prisma.js';
 import type { User, Article } from '@prisma/client';
 import crypto from 'crypto';
+import { vi } from 'vitest';
 import { CreateArticleBody, UpdateArticleBody } from '../../src/modules/articles/article.dto.js';
+
+let fakeUrl: string;
+
+// s3-service 함수 모킹
+vi.mock('../../src/lib/s3-service.js', () => ({
+  moveFileToPermanent: vi.fn().mockImplementation((tempkey, _option) => {
+    return tempkey;
+  }),
+  getFileUrl: vi.fn().mockImplementation((key) => {
+    fakeUrl = `https://fake-url.com/${key}`;
+    return fakeUrl;
+  }),
+}));
 
 describe('Article API 통합 테스트', () => {
   let user1: User;
@@ -107,10 +121,12 @@ describe('Article API 통합 테스트', () => {
     createArticle = {
       title: '테스트 게시글 생성',
       content: '테스트 내용 생성',
+      imageKeys: ['test.png'],
     };
     updateArticle = {
       title: '테스트 게시글 수정',
       content: '테스트 내용 수정',
+      imageKeys: ['test2.png'],
     };
   });
 
@@ -131,17 +147,22 @@ describe('Article API 통합 테스트', () => {
       expect(response.body.data.title).toBe(createArticle.title);
       expect(response.body.data.content).toBe(createArticle.content);
       expect(response.body.data.user.id).toBe(user1.id);
+      expect(response.body.data.articleImages[0].fileUrl).toBe(fakeUrl);
       // 생성된 게시글을 저장하여 다른 테스트에서 사용
       article = response.body.data;
 
       // DB에 실제로 데이터가 저장되었는지 확인
       const dbArticle = await prisma.article.findUnique({
         where: { id: article.id },
+        include: {
+          articleImages: true,
+        },
       });
 
       expect(dbArticle).not.toBeNull();
       expect(dbArticle.title).toBe(createArticle.title);
       expect(dbArticle.content).toBe(createArticle.content);
+      expect(dbArticle.articleImages[0].key).toBe(createArticle.imageKeys![0]);
     });
 
     it('내용이 없으면 게시글 생성에 실패해야 합니다 (400 Bad Request)', async () => {
@@ -253,14 +274,19 @@ describe('Article API 통합 테스트', () => {
       expect(response.status).toBe(200);
       expect(response.body.data.title).toBe(updateArticle.title);
       expect(response.body.data.content).toBe(updateArticle.content);
+      expect(response.body.data.articleImages[0].fileUrl).toBe(fakeUrl);
 
       // DB에 실제로 데이터가 수정되었는지 확인
       const dbComment = await prisma.article.findUnique({
         where: { id: article.id },
+        include: {
+          articleImages: true,
+        },
       });
 
       expect(dbComment.title).toBe(updateArticle.title);
       expect(dbComment.content).toBe(updateArticle.content);
+      expect(dbComment.articleImages[0].key).toBe(updateArticle.imageKeys![0]);
     });
 
     it('수정할 내용이 없으면 게시글 수정에 실패해야 합니다 (400 Bad Request)', async () => {

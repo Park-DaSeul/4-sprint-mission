@@ -15,7 +15,7 @@
     "test:migrate": "dotenv -e .env.test prisma migrate deploy",
     "test:unit": "vitest run --dir test/unit",
     "test:unit:modules": "vitest run --coverage test/unit/modules",
-    "test:unit:articleComments": "vitest run test/unit/modules/articleComments.service.test.ts",
+    "test:unit:articleComments": "vitest run --coverage test/unit/modules/articleComments.service.test.ts",
     "--- TEST:INTEGRATION ---": "",
     "test:integration": "vitest run --dir test/integration --maxWorkers=1",
     "test:integration:articleComments": "vitest run test/integration/articleComments.test.ts --maxWorkers=1",
@@ -34,7 +34,7 @@
     "format": "prettier --write .",
     "--- BUILD/RUN ---": "",
     "dev": "nodemon --exec tsx src/server.ts",
-    "start": "NODE_ENV=production node dist/app.js",
+    "start": "NODE_ENV=production node dist/server.js",
     "build": "tsc"
   },
   "keywords": [],
@@ -55,7 +55,7 @@
     "@types/supertest": "^6.0.3",
     "@vitest/coverage-v8": "^4.0.7",
     "dotenv-cli": "^11.0.0",
-    "jest": "^30.2.0",
+    "jest": "^29.7.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "prisma": "^6.13.0",
@@ -68,6 +68,8 @@
     "vitest": "^4.0.7"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.932.0",
+    "@aws-sdk/s3-presigned-post": "^3.934.0",
     "@prisma/client": "^6.13.0",
     "@types/express": "^5.0.3",
     "bcrypt": "^6.0.0",

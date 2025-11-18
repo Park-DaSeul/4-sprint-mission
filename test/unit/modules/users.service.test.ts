@@ -1,6 +1,7 @@
 import { UserService } from '../../../src/modules/users/user.service.js';
 import { UserRepository } from '../../../src/modules/users/user.repository.js';
 import * as common from '../../../src/common/index.js';
+import * as s3 from '../../../src/lib/s3-service.js';
 import { vi } from 'vitest';
 
 // 가짜(mock) 객체 생성
@@ -64,25 +65,31 @@ describe('UserService 유닛 테스트', () => {
         nickname: 'new-nickname',
         password: password,
         newPassword: newHashedPassword,
-        imageId: 'image-id-1',
+        imageKey: 'image-1.png',
       };
       const mockUpdatedUser = {
         id: userId,
         ...data,
       };
+      const fileUrl = `https://fake-url.com/${data.imageKey}}`;
 
       const verifySpy = vi.spyOn(common, 'verifyPassword').mockResolvedValue(undefined);
       const hashSpy = vi.spyOn(common, 'hashPassword').mockResolvedValue(newHashedPassword);
       mockUserRepository.updateUser.mockResolvedValue(mockUpdatedUser);
+      const permanentKeySpy = vi.spyOn(s3, 'moveFileToPermanent').mockResolvedValue(data.imageKey);
+      const fileUrlSpy = vi.spyOn(s3, 'getFileUrl').mockReturnValue(fileUrl);
 
       // --- 실행 (Act) ---
       const result = await userService.updateUser(userId, data, resource);
+
+      const imageData = { key: data.imageKey, fileUrl };
 
       const updateData = {
         nickname: data.nickname,
         password: newHashedPassword,
         userImage: {
-          connect: { id: data.imageId },
+          disconnect: true,
+          create: imageData,
         },
       };
 
@@ -91,6 +98,10 @@ describe('UserService 유닛 테스트', () => {
       expect(hashSpy).toHaveBeenCalledWith(data.newPassword);
       expect(mockUserRepository.updateUser).toHaveBeenCalledTimes(1);
       expect(mockUserRepository.updateUser).toHaveBeenCalledWith(userId, updateData);
+      expect(permanentKeySpy).toHaveBeenCalledTimes(1);
+      expect(permanentKeySpy).toHaveBeenCalledWith(data.imageKey, 'users');
+      expect(fileUrlSpy).toHaveBeenCalledTimes(1);
+      expect(fileUrlSpy).toHaveBeenCalledWith(data.imageKey);
       expect(result).toEqual(mockUpdatedUser);
     });
 

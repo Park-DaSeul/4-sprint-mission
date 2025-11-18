@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  // engineType = "library"
 }
 
 datasource db {
@@ -90,7 +91,7 @@ model Article {
 model UserImage {
   id        String   @id @default(uuid())
   fileUrl   String
-  publicId  String
+  key       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -102,7 +103,7 @@ model UserImage {
 model ProductImage {
   id        String   @id @default(uuid())
   fileUrl   String
-  publicId  String
+  key       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -114,7 +115,7 @@ model ProductImage {
 model ArticleImage {
   id        String   @id @default(uuid())
   fileUrl   String
-  publicId  String
+  key       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

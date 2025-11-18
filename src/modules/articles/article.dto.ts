@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { AuthenticatedRequest, OptionalAuthRequest } from '../../types/request.type.js';
 import type { IdParams, OffsetQuery } from '../../common/index.js';
-import type { Article } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 
 // -----------------
 // |  TYPE & DATA  |
@@ -26,8 +26,12 @@ export interface CreateArticleRequest extends AuthenticatedRequest {
 export interface UpdateArticleRequest extends AuthenticatedRequest {
   parsedParams: IdParams;
   parsedBody: UpdateArticleBody;
-  resource: Article;
+  resource: ArticleWithImages;
 }
+
+export type ArticleWithImages = Prisma.ArticleGetPayload<{
+  include: { articleImages: true };
+}>;
 
 // 게시글 삭제
 export interface DeleteArticleRequest extends AuthenticatedRequest {
@@ -47,13 +51,9 @@ const contentSchema = z
   .string()
   .min(1, '내용은 최소 1글자 이상이어야 합니다.')
   .max(1000, '내용은 최대 1000글자까지 가능합니다.');
-const imageIddsSchema = z
+const imageKeysSchema = z
   .array(
-    z
-      .object({
-        id: z.uuid(),
-      })
-      .strict(),
+    z.string().min(1, '이미지 키는 최소 1글자 이상이어야 합니다.').max(255, '이미지 키는 최대 255글자까지 가능합니다.'),
   )
   .min(1, '이미지는 최소 1개 이상이어야 합니다.')
   .max(5, '이미지는 최대 5개까지 가능합니다.');
@@ -63,7 +63,7 @@ export const createArticle = z
   .object({
     title: titleSchema,
     content: contentSchema,
-    imageIds: imageIddsSchema.optional(),
+    imageKeys: imageKeysSchema.optional(),
   })
   .strict();
 

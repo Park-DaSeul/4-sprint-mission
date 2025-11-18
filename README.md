@@ -1,13 +1,13 @@
 # 🚀 UJU API 서버
 
-9번째 스프린트 미션을 위해 제작된 API 서버입니다. 이 서버는 상품 및 게시글 관리를 위한 백엔드 서비스를 제공하며, 사용자 인증, 실시간 알림 등 다양한 기능을 포함하고 있습니다.
+10번째 스프린트 미션을 위해 제작된 API 서버입니다. 이 서버는 상품 및 게시글 관리를 위한 백엔드 서비스를 제공하며, 사용자 인증, 실시간 알림 등 다양한 기능을 포함하고 있습니다.
 
 ## ✨ 주요 기능
 
 - **사용자 인증:** 상태 저장 리프레시 토큰(Stateful Refresh Tokens) 방식을 사용한 안전한 사용자 회원가입 및 로그인.
 - **상품 및 게시글 관리:** 상품 및 게시글에 대한 CRUD(생성, 조회, 수정, 삭제) 기능.
 - **댓글 및 좋아요:** 상품 및 게시글에 대한 댓글과 좋아요 기능.
-- **이미지 업로드:** Cloudinary를 연동하여 사용자 프로필, 상품, 게시글 이미지 업로드.
+- **이미지 업로드:** AWS S3를 연동하여 사용자 프로필, 상품, 게시글 이미지 업로드.
 - **실시간 알림:** Socket.io를 사용하여 댓글 및 좋아요에 대한 실시간 알림 기능.
 - **마이페이지:** 사용자가 등록한 상품, 좋아요 누른 상품 목록 조회.
 - **주기적 작업:** Cron Job을 사용하여 더미 이미지 파일을 주기적으로 삭제.
@@ -20,10 +20,18 @@
 - **인증:** Passport.js (JWT & Local Strategies)
 - **테스트:** Vitest
 - **유효성 검사:** Zod
-- **이미지 처리:** Cloudinary
+- **이미지 처리:** AWS S3
 - **실시간 통신:** Socket.io
 - **환경 변수 관리:** Dotenv
 - **코드 포맷팅:** Prettier
+
+## 🚀 배포
+
+이 서버는 AWS EC2에 배포되었으며, 아래 주소에서 API를 호출할 수 있습니다.
+
+- **서버 주소:** `http://54.180.227.72`
+
+`http/test.http` 파일의 `@host` 변수를 이 주소로 변경하여 배포된 서버를 테스트할 수 있습니다.
 
 ## 📂 프로젝트 구조
 
@@ -35,6 +43,7 @@
 ├── package.json         # 프로젝트 메타데이터 및 스크립트
 ├── tsconfig.json        # TypeScript 설정 파일
 ├── vitest.config.ts     # Vitest 설정 파일
+├── archive/             # 현재 사용하지 않는 코드 아카이브
 ├── coverage/            # 테스트 커버리지 보고서
 ├── dist/                # 컴파일된 JavaScript 파일 (빌드 결과)
 ├── erd/                 # ERD(개체-관계 다이어그램) 관련 파일 및 SQL 쿼리
@@ -45,7 +54,7 @@
 │   ├── app.ts           # Express 애플리케이션 진입점
 │   ├── server.ts        # 서버 시작 및 설정
 │   ├── common/          # 공통 유효성 검사 및 유틸리티
-│   ├── config/          # CORS, Cloudinary 등 설정 파일
+│   ├── config/          # CORS, Cloudinary, S3 등 설정 파일
 │   ├── lib/             # Prisma 클라이언트, Passport, Socket.io 등 라이브러리
 │   ├── middlewares/     # Express 미들웨어 (에러 핸들링, 인증, 유효성 검사)
 │   ├── modules/         # 기능별 모듈 (auth, users, products, articles 등)
@@ -95,6 +104,9 @@
     # 서버 포트
     PORT=3000
 
+    # CORS 설정
+    CORS_ORIGIN=http://localhost:3000
+
     # 데이터베이스 URL
     DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 
@@ -102,10 +114,11 @@
     JWT_ACCESS_TOKEN_SECRET="YOUR_ACCESS_TOKEN_SECRET"
     JWT_REFRESH_TOKEN_SECRET="YOUR_REFRESH_TOKEN_SECRET"
 
-    # Cloudinary 설정
-    CLOUDINARY_CLOUD_NAME="YOUR_CLOUD_NAME"
-    CLOUDINARY_API_KEY="YOUR_API_KEY"
-    CLOUDINARY_API_SECRET="YOUR_API_SECRET"
+    # AWS S3 설정 (선택 사항)
+    AWS_S3_BUCKET_NAME="YOUR_S3_BUCKET_NAME"
+    AWS_S3_REGION="YOUR_S3_REGION"
+    AWS_ACCESS_KEY_ID="YOUR_AWS_ACCESS_KEY"
+    AWS_SECRET_ACCESS_KEY="YOUR_AWS_SECRET_KEY"
     ```
 
 4.  **데이터베이스 마이그레이션:**
@@ -177,8 +190,9 @@ VS Code의 REST Client 확장 프로그램을 사용하면 `http/test.http` 파�
 
 1.  VS Code에서 `REST Client` 확장 프로그램을 설치합니다.
 2.  `http/test.http` 파일을 엽니다.
-3.  `@login` 요청을 먼저 보내 토큰을 발급받습니다. (REST Client가 자동으로 토큰을 변수에 저장합니다.)
-4.  테스트하고 싶은 다른 API 요청 상단의 `Send Request` 버튼을 클릭하여 실행합니다.
+3.  파일 상단의 `@host` 변수를 로컬(`http://localhost:3000`) 또는 배포 서버(`http://54.180.227.72`) 주소로 설정합니다.
+4.  `@login` 요청을 먼저 보내 토큰을 발급받습니다. (REST Client가 자동으로 토큰을 변수에 저장합니다.)
+5.  테스트하고 싶은 다른 API 요청 상단의 `Send Request` 버튼을 클릭하여 실행합니다.
 
 ### WebSocket API (실시간 알림)
 
@@ -205,7 +219,10 @@ VS Code의 REST Client 확장 프로그램을 사용하면 `http/test.http` 파�
 - `DELETE /users/me`: 회원 탈퇴
 - `GET /users/me/products`: 내가 등록한 상품 조회
 - `GET /users/me/likes`: 내가 좋아요 누른 상품 조회
-- `POST /userImages`: 사용자 프로필 이미지 업로드/수정
+
+### 이미지 (Images)
+
+- `POST /images/upload`: 이미지 업로드 (사용자, 상품, 게시글 공통)
 
 ### 상품 (Products)
 
@@ -214,7 +231,6 @@ VS Code의 REST Client 확장 프로그램을 사용하면 `http/test.http` 파�
 - `GET /products/:id`: 상품 상세 조회
 - `PUT /products/:id`: 상품 수정
 - `DELETE /products/:id`: 상품 삭제
-- `POST /productImages`: 상품 이미지 업로드/수정
 
 ### 게시글 (Articles)
 
@@ -223,7 +239,6 @@ VS Code의 REST Client 확장 프로그램을 사용하면 `http/test.http` 파�
 - `GET /articles/:id`: 게시글 상세 조회
 - `PUT /articles/:id`: 게시글 수정
 - `DELETE /articles/:id`: 게시글 삭제
-- `POST /articleImages`: 게시글 이미지 업로드/수정
 
 ### 댓글 (Comments)
 

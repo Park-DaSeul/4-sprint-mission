@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { AuthenticatedRequest } from '../../types/request.type.js';
+import type { Prisma } from '@prisma/client';
 
 // -----------------
 // |  TYPE & DATA  |
@@ -12,6 +13,10 @@ export interface GetUserRequest extends AuthenticatedRequest {}
 export interface UpdateUserRequest extends AuthenticatedRequest {
   parsedBody: UpdateUserBody;
 }
+
+export type UserWithImage = Prisma.UserGetPayload<{
+  include: { userImage: true };
+}>;
 
 // 사용자 삭제
 export interface DeleteUserRequest extends AuthenticatedRequest {
@@ -37,6 +42,10 @@ const passwordSchema = z
   .string()
   .min(6, '비밀번호는 최소 6자리 이상이어야 합니다.')
   .max(20, '비밀번호는 최대 20자리까지 가능합니다.');
+const imageKeySchema = z
+  .string()
+  .min(1, '이미지 키는 최소 1글자 이상이어야 합니다.')
+  .max(255, '이미지 키는 최대 255글자까지 가능합니다.');
 
 // 수정 (body)
 export const updateUser = z
@@ -44,7 +53,7 @@ export const updateUser = z
     nickname: nicknameSchema,
     password: passwordSchema.optional(),
     newPassword: passwordSchema.optional(),
-    imageId: z.uuid().optional(),
+    imageKey: imageKeySchema.optional(),
   })
   .strict();
 
