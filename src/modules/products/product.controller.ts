@@ -48,7 +48,7 @@ export class ProductController {
 
     const resource = req.resource;
 
-    const data = req.body;
+    const data = req.parsedBody;
     const product = await this.productService.updateProduct(id, userId, data, resource);
     return res.json({ success: true, data: product });
   };

@@ -1,15 +1,9 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Response, NextFunction } from 'express';
 import { v2 as cloudinary } from 'cloudinary';
 import type { UploadApiOptions } from 'cloudinary';
 import Busboy from 'busboy';
 import { BadRequestError, InternalServerError, PayloadTooLargeError } from '../utils/errorClass.js';
-
-export interface UploadRequest extends Request {
-  cloudinaryResult?: {
-    public_id: string;
-    secure_url: string;
-  };
-}
+import type { UploadRequest } from '../types/request.type.js';
 
 // 스트리밍 업로드 미들웨어 팩토리 함수: 폴더명을 인수로 받습니다.
 export const cloudinaryUploader = (option: UploadApiOptions) => {

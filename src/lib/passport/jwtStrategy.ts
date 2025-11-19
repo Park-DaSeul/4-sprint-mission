@@ -2,12 +2,8 @@ import { Strategy as JwtStrategy } from 'passport-jwt';
 import type { Request } from 'express';
 import type { User } from '@prisma/client';
 import prisma from '../prisma.js';
-import {
-  ACCESS_TOKEN_COOKIE_NAME,
-  REFRESH_TOKEN_COOKIE_NAME,
-  JWT_ACCESS_TOKEN_SECRET,
-  JWT_REFRESH_TOKEN_SECRET,
-} from '../constants.js';
+import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../constants.js';
+import { config } from '../../config/config.js';
 
 interface JwtPayload {
   sub: string;
@@ -17,12 +13,12 @@ type DoneCallback = (error: Error | null, user: User | false, info?: object) => 
 
 const accessTokenOptions = {
   jwtFromRequest: (req: Request) => req.cookies[ACCESS_TOKEN_COOKIE_NAME],
-  secretOrKey: JWT_ACCESS_TOKEN_SECRET,
+  secretOrKey: config.JWT_ACCESS_TOKEN_SECRET,
 };
 
 const refreshTokenOptions = {
   jwtFromRequest: (req: Request) => req.cookies[REFRESH_TOKEN_COOKIE_NAME],
-  secretOrKey: JWT_REFRESH_TOKEN_SECRET,
+  secretOrKey: config.JWT_REFRESH_TOKEN_SECRET,
 };
 
 const jwtVerify = async (payload: JwtPayload, done: DoneCallback) => {

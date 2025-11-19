@@ -48,7 +48,7 @@
     "typeRoots": ["./node_modules/@types", "./src/types"] // 커스텀 타입(express.d.ts)을 시작전에 인식 하도록 설정
   },
   "include": ["src/**/*", "test"], // 컴파일할 파일 범위 (src 폴더 아래의 모든 파일)
-  "exclude": ["node_modules", "dist"], // 컴파일에서 제외할 폴더
+  "exclude": ["node_modules", "dist", "test"], // 컴파일에서 제외할 폴더
   "ts-node": {
     "esm": true,
     "files": true

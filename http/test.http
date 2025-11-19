@@ -3,23 +3,23 @@
 @baseUrl = http://localhost:3000
 
 # =================================================================
-# Auth
+# User
 # =================================================================
 
 ### 회원가입
 # @name signup
-POST {{baseUrl}}/auth/signup HTTP/1.1
+POST {{baseUrl}}/auth/signup
 Content-Type: application/json
 
 {
-  "email": "test1@example.com",
+  "email": "test2@test.com",
   "password": "password123",
   "nickname": "슬이당3"
 }
 
 ### 로그인
 # @name login
-POST {{baseUrl}}/auth/login HTTP/1.1
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 ### 토큰 재발급
 # @name refresh
-POST {{baseUrl}}/auth/refresh HTTP/1.1
+POST {{baseUrl}}/auth/refresh
 Content-Type: application/json
 
 { 
@@ -37,7 +37,7 @@ Content-Type: application/json
 
 ### 로그아웃
 # @name logout
-POST {{baseUrl}}/auth/logout HTTP/1.1
+POST {{baseUrl}}/auth/logout
 
 ### 사용자 조회
 # @name getUser
@@ -86,9 +86,9 @@ Content-Type: application/json
   "password": "password123"
 }
 
-###################
-### 상품 테스트
-###################
+# =================================================================
+# Product
+# =================================================================
 
 ### 상품 생성
 # @name createProduct
@@ -133,13 +133,13 @@ GET {{baseUrl}}/products/1b4298aa-9349-4351-b7a8-2195b3c3f56b
 
 ### 상품 수정
 # @name updateProduct
-PUT {{baseUrl}}/products/1b4298aa-9349-4351-b7a8-2195b3c3f56b
+PUT {{baseUrl}}/products/854235ae-b2b6-4aa1-8081-d5551bd2c250
 Content-Type: application/json
 
 {
-  "name": "상품생성2",
+  "name": "상품수정3",
   "description": "이건 테스트 시험입니다.",
-  "price": 100,
+  "price": 40000,
   "tags": ["수정"]
 }
 
@@ -179,20 +179,16 @@ DELETE {{baseUrl}}/productComments/c0e8a83a-1d6c-4d4a-b387-b230794190ba
 
 ### 상품 좋아요
 # @name createProductLike
-POST {{baseUrl}}/products/1b4298aa-9349-4351-b7a8-2195b3c3f56b/likes
-
-
-##################
-# 게시글 테스트
-####################
+POST {{baseUrl}}/products/854235ae-b2b6-4aa1-8081-d5551bd2c250/likes
 
 # =================================================================
-# Articles (Manual ID Pasting)
+# Article
 # =================================================================
 
 ### 게시글 생성
 # @name createArticle
-POST {{baseUrl}}/articles HTTP/1.1
+@articleId = {{$jsonPath response.body.data.id}}
+POST {{baseUrl}}/articles
 Content-Type: application/json
 
 {
@@ -200,29 +196,26 @@ Content-Type: application/json
   "content": "한글로 만들어야지2",
   "imageIds": [
     {
-      "id": "d26228c0-11ee-42db-a453-eb6079f0d43d"
+      "id": "9bed2f6c-3b8b-4b6b-a8fd-eabf1ed95152"
     },
     {
-      "id": "fe62f1ad-a155-4cc8-a775-5067eb79078d"
+      "id": "8729e284-1a5b-464a-9159-0eddc15f8b02"
     }
   ]
 }
 
 ### 모든 게시글 조회
 # @name getArticles
-# 3. Paste the copied ID into the URL below and run the request.
 GET {{baseUrl}}/articles
 
 ### 특정 게시글 조회
 # @name getArticleById
-# 3. Paste the copied ID into the URL below and run the request.
-GET {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e HTTP/1.1
+GET {{baseUrl}}/articles/{{articleId}}
 
 
 ### 게시글 수정
 # @name updateArticle
-# 4. Use the same ID to update the article.
-PUT {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e HTTP/1.1
+PUT {{baseUrl}}/articles/{{articleId}}
 Content-Type: application/json
 
 {
@@ -233,14 +226,14 @@ Content-Type: application/json
       "id": "d26228c0-11ee-42db-a453-eb6079f0d43d"
     },
     {
-      "id": "fe62f1ad-a155-4cc8-a775-5067eb79078d"
+      "id": "9729e284-1a5b-464a-9159-0eddc15f8b06"
     }
   ]
 }
 
 ### 게시글 삭제
 # @name deleteArticle
-DELETE {{baseUrl}}/articles/7d100e09-090d-4e2b-9ff8-b160fb103f11 HTTP/1.1
+DELETE {{baseUrl}}/articles/{{articleId}} 
 
 ### 게시글 이미지 업로드
 # @name createArticleImage
@@ -288,9 +281,9 @@ DELETE {{baseUrl}}/articleComments/a9743caf-01d3-4e22-8a1e-7df6dc015ea0
 # @name createProductLike
 POST {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e/likes
 
-##################
-# 알림 테스트
-####################
+# =================================================================
+# Notification
+# =================================================================
 
 ### 사용자 모든 알림 조회
 # @name getNotifications

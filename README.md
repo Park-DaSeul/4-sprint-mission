@@ -1,6 +1,6 @@
 # 🚀 UJU API 서버
 
-8번째 스프린트 미션을 위해 제작된 API 서버입니다. 이 서버는 상품 및 게시글 관리를 위한 백엔드 서비스를 제공하며, 사용자 인증, 실시간 알림 등 다양한 기능을 포함하고 있습니다.
+9번째 스프린트 미션을 위해 제작된 API 서버입니다. 이 서버는 상품 및 게시글 관리를 위한 백엔드 서비스를 제공하며, 사용자 인증, 실시간 알림 등 다양한 기능을 포함하고 있습니다.
 
 ## ✨ 주요 기능
 
@@ -18,6 +18,7 @@
 - **데이터베이스:** PostgreSQL
 - **ORM:** Prisma
 - **인증:** Passport.js (JWT & Local Strategies)
+- **테스트:** Vitest
 - **유효성 검사:** Zod
 - **이미지 처리:** Cloudinary
 - **실시간 통신:** Socket.io
@@ -28,8 +29,21 @@
 
 ```
 /
+├── .env.sample          # 환경 변수 샘플 파일
+├── .gitignore           # Git이 무시할 파일 및 폴더 목록
+├── .prettierrc          # Prettier 설정 파일
+├── package.json         # 프로젝트 메타데이터 및 스크립트
+├── tsconfig.json        # TypeScript 설정 파일
+├── vitest.config.ts     # Vitest 설정 파일
+├── coverage/            # 테스트 커버리지 보고서
+├── dist/                # 컴파일된 JavaScript 파일 (빌드 결과)
+├── erd/                 # ERD(개체-관계 다이어그램) 관련 파일 및 SQL 쿼리
+├── http/                # REST Client 테스트 요청 파일 및 이미지 샘플
 ├── prisma/              # Prisma 스키마, 마이그레이션, 시드 파일
+├── scripts/             # 유틸리티 스크립트 (예: WebSocket 테스트)
 ├── src/
+│   ├── app.ts           # Express 애플리케이션 진입점
+│   ├── server.ts        # 서버 시작 및 설정
 │   ├── common/          # 공통 유효성 검사 및 유틸리티
 │   ├── config/          # CORS, Cloudinary 등 설정 파일
 │   ├── lib/             # Prisma 클라이언트, Passport, Socket.io 등 라이브러리
@@ -46,9 +60,9 @@
 │   ├── routes/          # 메인 라우터
 │   ├── types/           # 타입 정의
 │   └── utils/           # 유틸리티 함수 (asyncHandler, errorClass)
-├── .env.sample          # 환경 변수 샘플 파일
-├── package.json
-└── README.md
+└── test/                # 단위 및 통합 테스트 파일
+    ├── integration/     # 통합 테스트 파일
+    └── unit/            # 단위 테스트 파일
 ```
 
 ## ⚙️ 시작하기
@@ -118,6 +132,42 @@
   ```
 
 서버는 `.env` 파일에 지정된 포트(기본값: 3000)에서 시작됩니다.
+
+## ✅ 테스트
+
+이 프로젝트는 `vitest`를 사용하여 단위(Unit) 테스트와 통합(Integration) 테스트를 모두 지원합니다.
+
+### 테스트 환경 설정
+
+테스트를 실행하기 전에, 테스트용 데이터베이스를 설정해야 합니다.
+
+1.  `.env.test` 파일을 생성하고 테스트용 데이터베이스 URL을 설정합니다.
+    ```env
+    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/TEST_DATABASE?schema=public"
+    ```
+2.  아래 명령어를 실행하여 테스트 데이터베이스를 마이그레이션하고 Prisma 클라이언트를 생성합니다.
+    ```bash
+    npm run test:setup
+    ```
+
+### 테스트 실행
+
+- **모든 테스트 실행:**
+  ```bash
+  npm test
+  ```
+- **단위 테스트만 실행:**
+  ```bash
+  npm run test:unit
+  ```
+- **통합 테스트만 실행:**
+  ```bash
+  npm run test:integration
+  ```
+- **특정 통합 테스트 파일 실행 (예: `auth`):**
+  ```bash
+  npm run test:integration:auth
+  ```
 
 ## 📝 API 엔드포인트
 

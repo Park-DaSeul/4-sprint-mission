@@ -11,6 +11,11 @@ export class ProductLikeRepository {
         id: true,
         createdAt: true,
         updatedAt: true,
+        user: {
+          select: {
+            id: true,
+          },
+        },
         product: {
           select: {
             id: true,

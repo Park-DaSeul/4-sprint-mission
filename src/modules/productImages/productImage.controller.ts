@@ -8,10 +8,6 @@ export class ProductImageController {
 
   // 상품 사진 생성 (업로드)
   public createProductImage = async (req: CreateProductImageRequest, res: Response) => {
-    if (!req.cloudinaryResult) {
-      throw new Error('사진 업로드 정보가 필요합니다.');
-    }
-
     const publicId = req.cloudinaryResult.public_id;
     const fileUrl = req.cloudinaryResult.secure_url;
 

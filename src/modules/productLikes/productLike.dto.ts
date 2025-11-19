@@ -1,4 +1,4 @@
-import type { AuthenticatedRequest } from '../../middlewares/auth.middleware.js';
+import type { AuthenticatedRequest } from '../../types/request.type.js';
 import type { ProductIdParams } from '../../common/index.js';
 
 // -----------------

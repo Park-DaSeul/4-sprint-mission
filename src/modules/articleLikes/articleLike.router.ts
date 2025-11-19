@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { articleLikeController } from './articleLike.container.js';
-import { validateArticleId } from './articleLike.middleware.js';
+import { validateArticleId, checkArticleExists } from './articleLike.middleware.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { authenticate } from '../../middlewares/auth.middleware.js';
 
@@ -10,6 +10,11 @@ const nestedArticleLikeRouter = Router({ mergeParams: true });
 nestedArticleLikeRouter.use(authenticate);
 
 // 게시글 좋아요 생성 (토글)
-nestedArticleLikeRouter.post('/', validateArticleId, asyncHandler(articleLikeController.createArticleLike));
+nestedArticleLikeRouter.post(
+  '/',
+  validateArticleId,
+  checkArticleExists,
+  asyncHandler(articleLikeController.createArticleLike),
+);
 
 export { nestedArticleLikeRouter };

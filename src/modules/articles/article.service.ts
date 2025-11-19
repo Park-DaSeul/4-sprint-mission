@@ -1,8 +1,8 @@
 import { ArticleRepository } from './article.repository.js';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, Article } from '@prisma/client';
 import type { CreateArticleBody, UpdateArticleBody } from './article.dto.js';
 import type { OffsetQuery } from '../../common/index.js';
-import type { Article } from '@prisma/client';
+import { NotFoundError, BadRequestError } from '../../utils/errorClass.js';
 
 export class ArticleService {
   constructor(private articleRepository: ArticleRepository) {}
@@ -68,7 +68,7 @@ export class ArticleService {
   // 특정 게시글 조회
   public getArticleById = async (id: string, userId: string) => {
     const article = await this.articleRepository.getArticleById(id, userId);
-    if (!article) throw new Error('게시글을 찾을 수 없습니다.');
+    if (!article) throw new NotFoundError('게시글을 찾을 수 없습니다.');
 
     // 데이터 가공
     // isLiked로 좋아요를 불리언 값으로 변환
@@ -119,7 +119,7 @@ export class ArticleService {
     };
 
     if (Object.keys(updateData).length === 0) {
-      throw new Error('수정할 내용이 없습니다.');
+      throw new BadRequestError('수정할 내용이 없습니다.');
     }
 
     const article = await this.articleRepository.updateArticle(id, updateData);

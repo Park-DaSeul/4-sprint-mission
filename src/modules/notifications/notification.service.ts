@@ -23,7 +23,7 @@ export class NotificationService {
       take,
       skip: cursor ? 1 : 0,
       ...(cursor && { cursor: { id: cursor } }),
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     };
 
     const notifications = await this.notificationRepository.getNotifications(getQuery);
@@ -48,7 +48,9 @@ export class NotificationService {
 
   // 사용자 알림 대량 생성
   public createNotifications = async (data: CreateNotificationBody[]) => {
-    const notifications = await this.notificationRepository.createNotifications(data);
+    const createData: Prisma.NotificationCreateManyInput[] = data;
+
+    const notifications = await this.notificationRepository.createNotifications(createData);
 
     // Socket.io를 통해 실시간으로 알림 전송
     const io = getSocketIo();

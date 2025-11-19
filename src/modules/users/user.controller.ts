@@ -25,7 +25,7 @@ export class UserController {
 
     const resource = req.user;
 
-    const data = req.body;
+    const data = req.parsedBody;
     const user = await this.userService.updateUser(id, data, resource);
     return res.status(200).json({ success: true, data: user });
   };
@@ -36,7 +36,7 @@ export class UserController {
 
     const resource = req.user;
 
-    const data = req.body;
+    const data = req.parsedBody;
     await this.userService.deleteUser(id, data, resource);
     return res.status(200).json({ success: true, message: '사용자가 삭제되었습니다.' });
   };
