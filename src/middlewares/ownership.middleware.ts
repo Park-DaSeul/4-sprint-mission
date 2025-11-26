@@ -3,12 +3,12 @@ import { ForbiddenError, NotFoundError } from '../utils/errorClass.js';
 import type { OwnershipRequest, ResourceExistsRequest } from '../types/request.type.js';
 
 interface PrismaDelegate {
-  findUnique: (args: { where: { id: string } }) => Promise<any>;
+  findUnique: (args: { where: { id: string }; include?: object }) => Promise<any>;
 }
 
 // 인가 확인 미들웨어
 export const checkOwnership =
-  (delegate: PrismaDelegate, userFieldName = 'userId') =>
+  (delegate: PrismaDelegate, userFieldName = 'userId', include?: object) =>
   async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const typedReq = req as OwnershipRequest;
@@ -18,6 +18,7 @@ export const checkOwnership =
 
       const resource = await delegate.findUnique({
         where: { id: resourceId },
+        ...(include && { include }),
       });
 
       if (!resource) {

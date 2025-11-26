@@ -6,13 +6,13 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 let envPath;
 
 switch (NODE_ENV) {
-  case 'production':
-    envPath = path.resolve(process.cwd(), '.env.production');
-    break;
+  // case 'production':
+  //   envPath = path.resolve(process.cwd(), '.env.production');
+  //   break;
   case 'test':
     envPath = path.resolve(process.cwd(), '.env.test');
     break;
-  default: // 기본값: 'development'
+  default:
     envPath = path.resolve(process.cwd(), '.env');
     break;
 }

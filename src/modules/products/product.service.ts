@@ -5,6 +5,7 @@ import type { OffsetQuery } from '../../common/index.js';
 import { NotificationService } from '../notifications/notification.service.js';
 import type { CreateNotificationBody } from '../notifications/notification.dto.js';
 import { NotFoundError, BadRequestError } from '../../utils/errorClass.js';
+import { getFileUrl, moveFileToPermanent } from '../../lib/s3-service.js';
 
 export class ProductService {
   constructor(
@@ -88,7 +89,16 @@ export class ProductService {
 
   // 상품 생성
   public createProduct = async (userId: string, data: CreateProductBody) => {
-    const { name, description, price, tags, imageIds } = data;
+    const { name, description, price, tags, imageKeys } = data;
+
+    // S3 파일 이동
+    const imagesData = await Promise.all(
+      imageKeys.map(async (tempKey) => {
+        const permanentKey = await moveFileToPermanent(tempKey, 'products');
+        const fileUrl = getFileUrl(permanentKey);
+        return { key: permanentKey, fileUrl };
+      }),
+    );
 
     const createData: Prisma.ProductCreateInput = {
       name,
@@ -99,7 +109,7 @@ export class ProductService {
         connect: { id: userId },
       },
       productImages: {
-        connect: imageIds,
+        create: imagesData,
       },
     };
 

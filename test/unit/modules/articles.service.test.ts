@@ -1,5 +1,6 @@
 import { ArticleService } from '../../../src/modules/articles/article.service.js';
 import { ArticleRepository } from '../../../src/modules/articles/article.repository.js';
+import * as s3 from '../../../src/lib/s3-service.js';
 import { vi } from 'vitest';
 
 // 가짜(mock) 객체 생성
@@ -23,6 +24,16 @@ describe('ArticleService 유닛 테스트', () => {
     userId: userId,
     createdAt: new Date(),
     updatedAt: new Date(),
+    articleImages: [
+      {
+        id: 'image-id-1',
+        fileUrl: 'https://fake-url.com/image-1.png',
+        key: 'image-1.png',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        articleId: articleId,
+      },
+    ],
   };
 
   // 테스트 케이스가 실행되기 전에 매번 실행
@@ -157,16 +168,22 @@ describe('ArticleService 유닛 테스트', () => {
       const data = {
         title: '테스트 제목',
         content: '테스트 내용',
-        imageIds: [{ id: 'image-1' }],
+        imageKeys: ['image-1.png'],
       };
       const mockCreatedArticle = {
         id: articleId,
         ...data,
       };
+      const fileUrl = `https://fake-url.com/${data.imageKeys[0]}}`;
+
       mockArticleRepository.createArticle.mockResolvedValue(mockCreatedArticle);
+      const permanentKeySpy = vi.spyOn(s3, 'moveFileToPermanent').mockResolvedValue(data.imageKeys[0]);
+      const fileUrlSpy = vi.spyOn(s3, 'getFileUrl').mockReturnValue(fileUrl);
 
       // --- 실행 (Act) ---
       const result = await articleService.createArticle(userId, data);
+
+      const imagesData = [{ key: data.imageKeys[0], fileUrl }];
 
       const createData = {
         title: data.title,
@@ -175,13 +192,17 @@ describe('ArticleService 유닛 테스트', () => {
           connect: { id: userId },
         },
         articleImages: {
-          connect: data.imageIds,
+          create: imagesData,
         },
       };
 
       // --- 검증 (Assert) ---
       expect(mockArticleRepository.createArticle).toHaveBeenCalledTimes(1);
       expect(mockArticleRepository.createArticle).toHaveBeenCalledWith(createData);
+      expect(permanentKeySpy).toHaveBeenCalledTimes(1);
+      expect(permanentKeySpy).toHaveBeenCalledWith(data.imageKeys[0], 'articles');
+      expect(fileUrlSpy).toHaveBeenCalledTimes(1);
+      expect(fileUrlSpy).toHaveBeenCalledWith(data.imageKeys[0]);
       expect(result).toEqual(mockCreatedArticle);
     });
 
@@ -225,28 +246,39 @@ describe('ArticleService 유닛 테스트', () => {
       const data = {
         title: '수정된 제목',
         content: '수정된 내용',
-        imageIds: [{ id: 'image-2' }],
+        imageKeys: ['image-2.png'],
       };
       const mockUpdatedArticle = {
         id: articleId,
         ...data,
       };
+      const fileUrl = `https://fake-url.com/${data.imageKeys[0]}}`;
+
       mockArticleRepository.updateArticle.mockResolvedValue(mockUpdatedArticle);
+      const permanentKeySpy = vi.spyOn(s3, 'moveFileToPermanent').mockResolvedValue(data.imageKeys[0]);
+      const fileUrlSpy = vi.spyOn(s3, 'getFileUrl').mockReturnValue(fileUrl);
 
       // --- 실행 (Act) ---
       const result = await articleService.updateArticle(articleId, data, resource);
+
+      const imagesData = [{ key: data.imageKeys[0], fileUrl }];
 
       const updateData = {
         title: data.title,
         content: data.content,
         articleImages: {
-          set: data.imageIds,
+          disconnect: resource.articleImages.map((image) => ({ id: image.id })),
+          create: imagesData,
         },
       };
 
       // --- 검증 (Assert) ---
       expect(mockArticleRepository.updateArticle).toHaveBeenCalledTimes(1);
       expect(mockArticleRepository.updateArticle).toHaveBeenCalledWith(articleId, updateData);
+      expect(permanentKeySpy).toHaveBeenCalledTimes(1);
+      expect(permanentKeySpy).toHaveBeenCalledWith(data.imageKeys[0], 'articles');
+      expect(fileUrlSpy).toHaveBeenCalledTimes(1);
+      expect(fileUrlSpy).toHaveBeenCalledWith(data.imageKeys[0]);
       expect(result).toEqual(mockUpdatedArticle);
     });
 

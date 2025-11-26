@@ -1,8 +1,9 @@
 import { ArticleRepository } from './article.repository.js';
-import type { Prisma, Article } from '@prisma/client';
-import type { CreateArticleBody, UpdateArticleBody } from './article.dto.js';
+import type { Prisma } from '@prisma/client';
+import type { CreateArticleBody, UpdateArticleBody, ArticleWithImages } from './article.dto.js';
 import type { OffsetQuery } from '../../common/index.js';
 import { NotFoundError, BadRequestError } from '../../utils/errorClass.js';
+import { getFileUrl, moveFileToPermanent } from '../../lib/s3-service.js';
 
 export class ArticleService {
   constructor(private articleRepository: ArticleRepository) {}
@@ -83,7 +84,20 @@ export class ArticleService {
 
   // 게시글 생성
   public createArticle = async (userId: string, data: CreateArticleBody) => {
-    const { title, content, imageIds } = data;
+    const { title, content, imageKeys } = data;
+
+    let imagesData: { key: string; fileUrl: string }[] = [];
+
+    if (imageKeys && imageKeys.length > 0) {
+      // S3 파일 이동
+      imagesData = await Promise.all(
+        imageKeys.map(async (tempKey) => {
+          const permanentKey = await moveFileToPermanent(tempKey, 'articles');
+          const fileUrl = getFileUrl(permanentKey);
+          return { key: permanentKey, fileUrl };
+        }),
+      );
+    }
 
     const createData: Prisma.ArticleCreateInput = {
       title,
@@ -91,9 +105,9 @@ export class ArticleService {
       user: {
         connect: { id: userId },
       },
-      ...(imageIds && {
+      ...(imageKeys && {
         articleImages: {
-          connect: imageIds,
+          create: imagesData,
         },
       }),
     };
@@ -104,16 +118,34 @@ export class ArticleService {
   };
 
   // 게시글 수정
-  public updateArticle = async (id: string, data: UpdateArticleBody, resource: Article) => {
-    const { title, content, imageIds } = data;
+  public updateArticle = async (id: string, data: UpdateArticleBody, resource: ArticleWithImages) => {
+    const { title, content, imageKeys } = data;
 
-    // 기존 데이터와 새 데이터 비교
+    let imagesData: { key: string; fileUrl: string }[] = [];
+
+    if (imageKeys && imageKeys.length > 0) {
+      // 기존 이미지 S3 파일 삭제
+      // if (existingImages && existingImages.length > 0) {
+      //   await Promise.all(existingImages.map((image) => deleteFileFromS3(image.publicId)));
+      // }
+
+      // S3 파일 이동
+      imagesData = await Promise.all(
+        imageKeys.map(async (tempKey) => {
+          const permanentKey = await moveFileToPermanent(tempKey, 'articles');
+          const fileUrl = getFileUrl(permanentKey);
+          return { key: permanentKey, fileUrl };
+        }),
+      );
+    }
+
     const updateData: Prisma.ArticleUpdateInput = {
       ...(title !== resource.title && { title }),
       ...(content !== resource.content && { content }),
-      ...(imageIds && {
+      ...(imageKeys && {
         articleImages: {
-          set: imageIds,
+          disconnect: resource.articleImages.map((image) => ({ id: image.id })),
+          create: imagesData,
         },
       }),
     };

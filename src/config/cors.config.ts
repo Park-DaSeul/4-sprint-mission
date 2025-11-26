@@ -27,11 +27,10 @@ switch (config.NODE_ENV) {
 
 export const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
-    // origin이 없거나 (예: Postman), 허용된 목록에 있는 경우
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    // 허용되지 않는 출처인 경우
+
     callback(new ForbiddenError('CORS 정책에 의해 허용되지 않는 출처입니다.'));
   },
   credentials: true,

@@ -1,4 +1,4 @@
-import type { AuthenticatedRequest } from '../../types/request.type.js';
+import type { AuthenticatedRequest } from '../../../src/types/request.type.js';
 
 // ----------
 // |  TYPE  |

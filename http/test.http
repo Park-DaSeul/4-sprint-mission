@@ -1,6 +1,9 @@
 # For more info on the REST Client extension, see: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
 
-@baseUrl = http://localhost:3000
+# @baseUrl = http://localhost:3000
+@baseUrl = http://54.180.227.72
+
+#http://54.180.227.72, http://localhost:3000
 
 # =================================================================
 # User
@@ -23,7 +26,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "test@test.com",
+  "email": "test2@test.com",
   "password": "password123"
 }
 
@@ -43,19 +46,6 @@ POST {{baseUrl}}/auth/logout
 # @name getUser
 GET {{baseUrl}}/users/me
 
-### 사용자 이미지 테스트
-# @name userImageUpload
-POST {{baseUrl}}/userImages
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="image"; filename="test.png"
-Content-Type: image/png
-
-< ./image/test.png
-------WebKitFormBoundary7MA4YWxkTrZu0gW--
-
-
 ### 사용자가 등록한 상품 조회
 # @name getUserProduct
 GET {{baseUrl}}/users/me/products
@@ -64,6 +54,62 @@ GET {{baseUrl}}/users/me/products
 # @name getUserLike
 GET {{baseUrl}}/users/me/likes
 
+### 사용자 이미지 생성
+# @name createUserImage
+@s3Url-user = {{createUserImage.response.body.data.url}}
+@key-user = {{createUserImage.response.body.data.fields.key}}
+@algorithm-user = {{createUserImage.response.body.data.fields.X-Amz-Algorithm}}
+@credential-user = {{createUserImage.response.body.data.fields.X-Amz-Credential}}
+@date-user = {{createUserImage.response.body.data.fields.X-Amz-Date}}
+@policy-user = {{createUserImage.response.body.data.fields.Policy}}
+@signature-user = {{createUserImage.response.body.data.fields.X-Amz-Signature}}
+POST {{baseUrl}}/images/upload
+Content-Type: application/json
+
+{
+  "filename": "test.png",
+  "contentType": "image/png"
+}
+
+### 사용자 이미지 업로드
+# @name createUserImageUpload
+POST {{s3Url-user}}
+Content-Type: multipart/form-data; boundary=upload-boundary
+
+--upload-boundary
+Content-Disposition: form-data; name="key"
+
+{{key-user}}
+--upload-boundary
+Content-Disposition: form-data; name="Content-Type"
+
+image/png
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Algorithm"
+
+{{algorithm-user}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Credential"
+
+{{credential-user}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Date"
+
+{{date-user}}
+--upload-boundary
+Content-Disposition: form-data; name="Policy"
+
+{{policy-user}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Signature"
+
+{{signature-user}}
+--upload-boundary
+Content-Disposition: form-data; name="file"; filename="test.png"
+Content-Type: image/png
+
+< ./image/test.png
+--upload-boundary--
 
 ### 사용자 수정
 # @name updateUser
@@ -74,7 +120,7 @@ Content-Type: application/json
   "nickname": "슬이당",
   "password": "password123",
   "newPassword": "password123",
-  "imageId": "3689617b-2950-453b-a9ed-42b0a6461f54"
+  "imageKey": "{{key-user}}"
 }
 
 ### 사용자 삭제
@@ -90,8 +136,66 @@ Content-Type: application/json
 # Product
 # =================================================================
 
+### 상품 이미지 생성
+# @name createProductImage
+@s3Url-product = {{createProductImage.response.body.data.url}}
+@key-product = {{createProductImage.response.body.data.fields.key}}
+@algorithm-product = {{createProductImage.response.body.data.fields.X-Amz-Algorithm}}
+@credential-product = {{createProductImage.response.body.data.fields.X-Amz-Credential}}
+@date-product = {{createProductImage.response.body.data.fields.X-Amz-Date}}
+@policy-product = {{createProductImage.response.body.data.fields.Policy}}
+@signature-product = {{createProductImage.response.body.data.fields.X-Amz-Signature}}
+POST {{baseUrl}}/images/upload
+Content-Type: application/json
+
+{
+  "filename": "test2.png",
+  "contentType": "image/png"
+}
+
+### 이미지 업로드
+# @name createProductImageUpload
+POST {{s3Url-product}}
+Content-Type: multipart/form-data; boundary=upload-boundary
+
+--upload-boundary
+Content-Disposition: form-data; name="key"
+
+{{key-product}}
+--upload-boundary
+Content-Disposition: form-data; name="Content-Type"
+
+image/png
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Algorithm"
+
+{{algorithm-product}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Credential"
+
+{{credential-product}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Date"
+
+{{date-product}}
+--upload-boundary
+Content-Disposition: form-data; name="Policy"
+
+{{policy-product}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Signature"
+
+{{signature-product}}
+--upload-boundary
+Content-Disposition: form-data; name="file"; filename="test2.png"
+Content-Type: image/png
+
+< ./image/test2.png
+--upload-boundary--
+
 ### 상품 생성
 # @name createProduct
+@productId = {{createProduct.response.body.data.id}}
 POST {{baseUrl}}/products
 Content-Type: application/json
 
@@ -100,27 +204,9 @@ Content-Type: application/json
   "description": "이건 테스트 시험입니다.",
   "price": 99.99,
   "tags": ["arewr"],
-  "imageIds": [
-    {
-      "id": "68f00e01-d008-4609-9825-273eebb47c96"
-    },
-    {
-      "id": "771cb52f-d90c-49ab-803b-f1fae3beba99"
-    }
-  ]
+  "imageKeys": ["{{key-product}}"]
 }
 
-### 상품 이미지 업로드
-# @name createProductImage
-POST {{baseUrl}}/productImages
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="image"; filename="test2.png"
-Content-Type: image/png
-
-< ./image/test2.png
-------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 
 ### 모든 상품 조회
@@ -129,15 +215,15 @@ GET {{baseUrl}}/products
 
 ### 특정 상품 조회
 # @name getProductById
-GET {{baseUrl}}/products/1b4298aa-9349-4351-b7a8-2195b3c3f56b
+GET {{baseUrl}}/products/{{productId}}
 
 ### 상품 수정
 # @name updateProduct
-PUT {{baseUrl}}/products/854235ae-b2b6-4aa1-8081-d5551bd2c250
+PUT {{baseUrl}}/products/{{productId}}
 Content-Type: application/json
 
 {
-  "name": "상품수정3",
+  "name": "상품수정4",
   "description": "이건 테스트 시험입니다.",
   "price": 40000,
   "tags": ["수정"]
@@ -145,11 +231,12 @@ Content-Type: application/json
 
 ### 상품 삭제
 # @name deleteProduct
-DELETE {{baseUrl}}/products/01384fc3-0958-47a5-9812-584217e8079c
+DELETE {{baseUrl}}/products/{{productId}}
 
 ### 상품 댓글 생성
-# @name createComment
-POST {{baseUrl}}/products/35b281a0-1736-4aeb-8630-4880695bf67d/comments
+# @name createProductComment
+@productCommentId = {{createProductComment.response.body.data.id}}
+POST {{baseUrl}}/products/{{productId}}/comments
 Content-Type: application/json
 
 {
@@ -157,16 +244,16 @@ Content-Type: application/json
 }
 
 ### 상품 모든 댓글 조회
-# @name getComments
-GET {{baseUrl}}/products/1b4298aa-9349-4351-b7a8-2195b3c3f56b/comments
+# @name getProductComments
+GET {{baseUrl}}/products/{{productId}}/comments
 
 ### 상품 특정 댓글 조회
-# @name getCommentById
-GET {{baseUrl}}/productComments/c0e8a83a-1d6c-4d4a-b387-b230794190ba
+# @name getProductCommentById
+GET {{baseUrl}}/productComments/{{productCommentId}}
 
 ### 상품 댓글 수정
-# @name updateComment
-PUT {{baseUrl}}/productComments/c0e8a83a-1d6c-4d4a-b387-b230794190ba
+# @name updateProductComment
+PUT {{baseUrl}}/productComments/{{productCommentId}}
 Content-Type: application/json
 
 {
@@ -174,34 +261,85 @@ Content-Type: application/json
 }
 
 ### 상품 댓글 삭제
-# @name deleteComment
-DELETE {{baseUrl}}/productComments/c0e8a83a-1d6c-4d4a-b387-b230794190ba
+# @name deleteProductComment
+DELETE {{baseUrl}}/productComments/{{productCommentId}}
 
 ### 상품 좋아요
 # @name createProductLike
-POST {{baseUrl}}/products/854235ae-b2b6-4aa1-8081-d5551bd2c250/likes
+POST {{baseUrl}}/products/{{productId}}/likes
 
 # =================================================================
 # Article
 # =================================================================
 
+### 게시글 이미지 생성
+# @name createArticleImage
+@s3Url-article = {{createArticleImage.response.body.data.url}}
+@key-article = {{createArticleImage.response.body.data.fields.key}}
+@algorithm-article = {{createArticleImage.response.body.data.fields.X-Amz-Algorithm}}
+@credential-article = {{createArticleImage.response.body.data.fields.X-Amz-Credential}}
+@date-article = {{createArticleImage.response.body.data.fields.X-Amz-Date}}
+@policy-article = {{createArticleImage.response.body.data.fields.Policy}}
+@signature-article = {{createArticleImage.response.body.data.fields.X-Amz-Signature}}
+POST {{baseUrl}}/images/upload
+Content-Type: application/json
+
+{
+  "filename": "test3.png",
+  "contentType": "image/png"
+}
+
+### 게시글 이미지 업로드
+# @name createArticleImageUpload
+POST {{s3Url-article}}
+Content-Type: multipart/form-data; boundary=upload-boundary
+
+--upload-boundary
+Content-Disposition: form-data; name="key"
+
+{{key-article}}
+--upload-boundary
+Content-Disposition: form-data; name="Content-Type"
+
+image/png
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Algorithm"
+
+{{algorithm-article}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Credential"
+
+{{credential-article}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Date"
+
+{{date-article}}
+--upload-boundary
+Content-Disposition: form-data; name="Policy"
+
+{{policy-article}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Signature"
+
+{{signature-article}}
+--upload-boundary
+Content-Disposition: form-data; name="file"; filename="test3.png"
+Content-Type: image/png
+
+< ./image/test3.png
+--upload-boundary--
+
+
 ### 게시글 생성
 # @name createArticle
-@articleId = {{$jsonPath response.body.data.id}}
+@articleId = {{createArticle.response.body.data.id}}
 POST {{baseUrl}}/articles
 Content-Type: application/json
 
 {
   "title": "테스트로 만든다2",
   "content": "한글로 만들어야지2",
-  "imageIds": [
-    {
-      "id": "9bed2f6c-3b8b-4b6b-a8fd-eabf1ed95152"
-    },
-    {
-      "id": "8729e284-1a5b-464a-9159-0eddc15f8b02"
-    }
-  ]
+  "imageKeys": ["{{key-article}}"]
 }
 
 ### 모든 게시글 조회
@@ -220,36 +358,19 @@ Content-Type: application/json
 
 {
   "title": "아티클을 수정하자",
-  "content": "이건 수정된 내용",
-   "imageIds": [
-  {
-      "id": "d26228c0-11ee-42db-a453-eb6079f0d43d"
-    },
-    {
-      "id": "9729e284-1a5b-464a-9159-0eddc15f8b06"
-    }
-  ]
+  "content": "이건 수정된 내용1"
 }
 
 ### 게시글 삭제
 # @name deleteArticle
 DELETE {{baseUrl}}/articles/{{articleId}} 
 
-### 게시글 이미지 업로드
-# @name createArticleImage
-POST {{baseUrl}}/articleImages
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="image"; filename="test3.png"
-Content-Type: image/png
-
-< ./image/test3.png
-------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ### 게시글 댓글 생성
-# @name createComment
-POST {{baseUrl}}/articles/4eb3215c-fe55-40d4-9da3-fdd6d42f9d9b/comments
+# @name createArticleComment
+@articleCommentId = {{createArticleComment.response.body.data.id}}
+POST {{baseUrl}}/articles/{{articleId}}/comments
 Content-Type: application/json
 
 {
@@ -258,15 +379,15 @@ Content-Type: application/json
 
 ### 게시글 모든 댓글 조회
 # @name getComments
-GET {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e/comments
+GET {{baseUrl}}/articles/{{articleId}}/comments
 
 ### 특정 게시글 댓글 조회
 # @name getCommentById
-GET {{baseUrl}}/articleComments/a9743caf-01d3-4e22-8a1e-7df6dc015ea0
+GET {{baseUrl}}/articleComments/{{articleCommentId}}
 
 ### 게시글 댓글 수정
 # @name updateComment
-PUT {{baseUrl}}/articleComments/a9743caf-01d3-4e22-8a1e-7df6dc015ea0
+PUT {{baseUrl}}/articleComments/{{articleCommentId}}
 Content-Type: application/json
 
 {
@@ -275,11 +396,11 @@ Content-Type: application/json
 
 ### 게시글 댓글 삭제
 # @name deleteComment
-DELETE {{baseUrl}}/articleComments/a9743caf-01d3-4e22-8a1e-7df6dc015ea0
+DELETE {{baseUrl}}/articleComments/{{articleCommentId}}
 
 ### 게시글 좋아요
 # @name createProductLike
-POST {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e/likes
+POST {{baseUrl}}/articles/{{articleId}}/likes
 
 # =================================================================
 # Notification
@@ -287,6 +408,7 @@ POST {{baseUrl}}/articles/fec60ad0-07e1-45bf-987b-5684e2d9745e/likes
 
 ### 사용자 모든 알림 조회
 # @name getNotifications
+@notificationId = {{getNotifications.response.body.data.notifications[0].id}}
 GET {{baseUrl}}/notifications
 
 ### 사용자 모든 개수 조회 (안읽음)
@@ -299,5 +421,103 @@ PUT {{baseUrl}}/notifications/all
 
 ### 사용자 알림 수정 (읽음)
 # @name updateNotification
-PUT {{baseUrl}}/notifications/cd1656f4-c7b6-4bf8-a05d-3949f7a1691a
+PUT {{baseUrl}}/notifications/{{notificationId}}
 
+# =================================================================
+# Image
+# =================================================================
+
+### 이미지 생성
+# @name createImage
+@s3Url = {{createImage.response.body.data.url}}
+@key = {{createImage.response.body.data.fields.key}}
+@algorithm = {{createImage.response.body.data.fields.X-Amz-Algorithm}}
+@credential = {{createImage.response.body.data.fields.X-Amz-Credential}}
+@date = {{createImage.response.body.data.fields.X-Amz-Date}}
+@policy = {{createImage.response.body.data.fields.Policy}}
+@signature = {{createImage.response.body.data.fields.X-Amz-Signature}}
+POST {{baseUrl}}/images/upload
+Content-Type: application/json
+
+{
+  "filename": "test4.png",
+  "contentType": "image/png"
+}
+
+### 이미지 업로드
+# @name createImageUpload
+POST {{s3Url}}
+Content-Type: multipart/form-data; boundary=upload-boundary
+
+--upload-boundary
+Content-Disposition: form-data; name="key"
+
+{{key}}
+--upload-boundary
+Content-Disposition: form-data; name="Content-Type"
+
+image/png
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Algorithm"
+
+{{algorithm}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Credential"
+
+{{credential}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Date"
+
+{{date}}
+--upload-boundary
+Content-Disposition: form-data; name="Policy"
+
+{{policy}}
+--upload-boundary
+Content-Disposition: form-data; name="X-Amz-Signature"
+
+{{signature}}
+--upload-boundary
+Content-Disposition: form-data; name="file"; filename="test4.png"
+Content-Type: image/png
+
+< ./image/test4.png
+--upload-boundary--
+
+
+# ### 사용자 이미지 테스트
+# # @name userImageUpload
+# POST {{baseUrl}}/userImages
+# Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+# ------WebKitFormBoundary7MA4YWxkTrZu0gW
+# Content-Disposition: form-data; name="image"; filename="test.png"
+# Content-Type: image/png
+
+# < ./image/test.png
+# ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+# ### 게시글 이미지 업로드
+# # @name createArticleImage
+# POST {{baseUrl}}/articleImages
+# Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+# ------WebKitFormBoundary7MA4YWxkTrZu0gW
+# Content-Disposition: form-data; name="image"; filename="test3.png"
+# Content-Type: image/png
+
+# < ./image/test3.png
+# ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+# ### 상품 이미지 업로드
+# # @name createProductImage
+# POST {{baseUrl}}/productImages
+# Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+# ------WebKitFormBoundary7MA4YWxkTrZu0gW
+# Content-Disposition: form-data; name="image"; filename="test2.png"
+# Content-Type: image/png
+
+# < ./image/test2.png
+# ------WebKitFormBoundary7MA4YWxkTrZu0gW--

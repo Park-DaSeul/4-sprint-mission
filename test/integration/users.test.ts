@@ -3,7 +3,21 @@ import bcrypt from 'bcrypt';
 import { app } from '../../src/app.js';
 import prisma from '../../src/lib/prisma.js';
 import type { User, Product, ProductLike } from '@prisma/client';
+import { vi } from 'vitest';
 import type { UpdateUserBody } from '../../src/modules/users/user.dto.js';
+
+let fakeUrl: string;
+
+// s3-service 함수 모킹
+vi.mock('../../src/lib/s3-service.js', () => ({
+  moveFileToPermanent: vi.fn().mockImplementation((tempkey, _option) => {
+    return tempkey;
+  }),
+  getFileUrl: vi.fn().mockImplementation((key) => {
+    fakeUrl = `https://fake-url.com/${key}`;
+    return fakeUrl;
+  }),
+}));
 
 describe('User API 통합 테스트', () => {
   let user1: User;
@@ -73,7 +87,7 @@ describe('User API 통합 테스트', () => {
             productImages: {
               create: [
                 {
-                  publicId: `user1_page_prod_${i}_pubid`,
+                  key: `user1_page_prod_${i}_pubid`,
                   fileUrl: `http://example.com/user1_page_prod_${i}.jpg`,
                 },
               ],
@@ -97,7 +111,7 @@ describe('User API 통합 테스트', () => {
           productImages: {
             create: [
               {
-                publicId: `user2_page_like_prod_${i}_pubid`,
+                key: `user2_page_like_prod_${i}_pubid`,
                 fileUrl: `http://example.com/user2_page_like_prod_${i}.jpg`,
               },
             ],
@@ -126,7 +140,7 @@ describe('User API 통합 테스트', () => {
         productImages: {
           create: [
             {
-              publicId: 'user1_prod1_pubid',
+              key: 'user1_prod1_pubid',
               fileUrl: 'http://example.com/user1_prod1.jpg',
             },
           ],
@@ -145,7 +159,7 @@ describe('User API 통합 테스트', () => {
         productImages: {
           create: [
             {
-              publicId: 'user2_prod_pubid',
+              key: 'user2_prod_pubid',
               fileUrl: 'http://example.com/user2_prod.jpg',
             },
           ],
@@ -164,6 +178,7 @@ describe('User API 통합 테스트', () => {
     // 테스트 객제 준비
     updateUser = {
       nickname: '테스트 별명 수정',
+      imageKey: 'test.png',
     };
   });
 
@@ -202,13 +217,18 @@ describe('User API 통합 테스트', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data.nickname).toBe(updateUser.nickname);
+      expect(response.body.data.userImage.fileUrl).toBe(fakeUrl);
 
       // DB에 실제로 데이터가 수정되었는지 확인
       const dbUser = await prisma.user.findUnique({
         where: { id: user1.id },
+        include: {
+          userImage: true,
+        },
       });
 
       expect(dbUser.nickname).toBe(updateUser.nickname);
+      expect(dbUser.userImage.key).toBe(updateUser.imageKey);
     });
 
     it('수정할 내용이 없으면 자신의 정보 수정에 실패해야 합니다 (400 Bad Request)', async () => {

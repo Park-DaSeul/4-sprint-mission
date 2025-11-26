@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import type { Response } from 'express';
 import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../lib/constants.js';
-import { config } from '../config/config.js';
+// import { config } from '../config/config.js';
 import { UnauthorizedError } from '../utils/errorClass.js';
 
 // 비밀번호 확인
@@ -21,7 +21,8 @@ export const tokensAndSetCookies = (res: Response, accessToken: string, refreshT
   // Access Token 쿠키 설정
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
-    secure: config.NODE_ENV === 'production',
+    // secure: config.NODE_ENV === 'production',
+    secure: false,
     sameSite: 'lax',
     maxAge: 1 * 60 * 60 * 1000, // 1시간
   });
@@ -29,7 +30,8 @@ export const tokensAndSetCookies = (res: Response, accessToken: string, refreshT
   // Refresh Token 쿠키 설정
   res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
     httpOnly: true,
-    secure: config.NODE_ENV === 'production',
+    // secure: config.NODE_ENV === 'production',
+    secure: false,
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     path: '/auth/refresh',

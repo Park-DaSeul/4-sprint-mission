@@ -1,11 +1,11 @@
 import request from 'supertest';
 import bcrypt from 'bcrypt';
-import { app } from '../../src/app';
-import prisma from '../../src/lib/prisma';
+import { app } from '../../../src/app.js';
+import prisma from '../../../src/lib/prisma.js';
 import type { User, ProductImage } from '@prisma/client';
 import { vi } from 'vitest';
 import type { Response, NextFunction } from 'express';
-import type { UploadRequest } from '../../src/types/request.type.js';
+import type { UploadRequest } from '../../../src/types/request.type.js';
 import { v2 as cloudinary } from 'cloudinary';
 
 // 모킹에 사용 할 테스트 객체 준비

@@ -25,4 +25,6 @@ export const validateUpdateBody = validateBody(updateArticle);
 // -------------------
 
 // 인가
-export const checkArticleOwner = checkOwnership(prisma.article);
+export const checkArticleOwner = checkOwnership(prisma.article, 'userId', {
+  articleImages: true,
+});

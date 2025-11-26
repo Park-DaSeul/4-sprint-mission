@@ -57,13 +57,9 @@ const tagsSchema = z
   .refine((tags) => tags.length > 0, {
     message: '태그를 최소 1개 이상 입력해야 합니다.',
   });
-const imageIddsSchema = z
+const imageKeysSchema = z
   .array(
-    z
-      .object({
-        id: z.uuid(),
-      })
-      .strict(),
+    z.string().min(1, '이미지 키는 최소 1글자 이상이어야 합니다.').max(255, '이미지 키는 최대 255글자까지 가능합니다.'),
   )
   .min(1, '이미지는 최소 1개 이상이어야 합니다.')
   .max(5, '이미지는 최대 5개까지 가능합니다.');
@@ -75,7 +71,7 @@ export const createProduct = z
     description: descriptionSchema,
     price: priceSchema,
     tags: tagsSchema,
-    imageIds: imageIddsSchema,
+    imageKeys: imageKeysSchema,
   })
   .strict();
 

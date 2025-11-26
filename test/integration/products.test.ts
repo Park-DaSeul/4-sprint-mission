@@ -2,7 +2,7 @@ import request from 'supertest';
 import bcrypt from 'bcrypt';
 import { app } from '../../src/app.js';
 import prisma from '../../src/lib/prisma.js';
-import type { User, Product, ProductImage } from '@prisma/client';
+import type { User, Product } from '@prisma/client';
 import crypto from 'crypto';
 import { vi } from 'vitest';
 import type { CreateProductBody, UpdateProductBody } from '../../src/modules/products/product.dto.js';
@@ -17,6 +17,19 @@ vi.mock('../../src/lib/socket.js', () => ({
   getSocketIo: vi.fn(() => ioMock),
 }));
 
+let fakeUrl: string;
+
+// s3-service 함수 모킹
+vi.mock('../../src/lib/s3-service.js', () => ({
+  moveFileToPermanent: vi.fn().mockImplementation((tempkey, _option) => {
+    return tempkey;
+  }),
+  getFileUrl: vi.fn().mockImplementation((key) => {
+    fakeUrl = `https://fake-url.com/${key}`;
+    return fakeUrl;
+  }),
+}));
+
 describe('Product API 통합 테스트', () => {
   let user1: User;
   let user2: User;
@@ -24,7 +37,6 @@ describe('Product API 통합 테스트', () => {
   let user2Cookies: string[];
   let user2product1: Product;
   let user2product2: Product;
-  let Image1: ProductImage;
   let product: Product;
 
   let createProduct: CreateProductBody;
@@ -90,7 +102,7 @@ describe('Product API 통합 테스트', () => {
             productImages: {
               create: [
                 {
-                  publicId: `test_public_id_${i}`,
+                  key: `test_public_id_${i}`,
                   fileUrl: `https://test-url.com/test_image_${i}.jpg`,
                 },
               ],
@@ -112,7 +124,7 @@ describe('Product API 통합 테스트', () => {
         productImages: {
           create: [
             {
-              publicId: `fake_public_id_1`,
+              key: `fake_public_id_1`,
               fileUrl: `https://fake-url.com/fake_image_1.jpg`,
             },
           ],
@@ -131,7 +143,7 @@ describe('Product API 통합 테스트', () => {
         productImages: {
           create: [
             {
-              publicId: `fake_public_id_2`,
+              key: `fake_public_id_2`,
               fileUrl: `https://fake-url.com/fake_image_2.jpg`,
             },
           ],
@@ -147,21 +159,13 @@ describe('Product API 통합 테스트', () => {
       },
     });
 
-    // 사진 생성 1
-    Image1 = await prisma.productImage.create({
-      data: {
-        publicId: 'fake_public_id-1',
-        fileUrl: 'https://fake-url.com/fake_image-1.jpg',
-      },
-    });
-
     // 테스트 객체 준비
     createProduct = {
       name: '테스트 상품 생성',
       description: '테스트 설명 생성',
       price: 10000,
       tags: ['테스트', '태그'],
-      imageIds: [{ id: Image1.id }],
+      imageKeys: ['test.png'],
     };
     updateProduct = {
       name: '테스트 상품 수정',
@@ -197,12 +201,16 @@ describe('Product API 통합 테스트', () => {
       expect(response.body.data.price).toBe(createProduct.price);
       expect(response.body.data.tags).toEqual(expect.arrayContaining(createProduct.tags));
       expect(response.body.data.user.id).toBe(user1.id);
+      expect(response.body.data.productImages[0].fileUrl).toBe(fakeUrl);
       // 생성된 상품을 저장하여 다른 테스트에서 사용
       product = response.body.data;
 
       // DB에 실제로 데이터가 저장되었는지 확인
       const dbProduct = await prisma.product.findUnique({
         where: { id: product.id },
+        include: {
+          productImages: true,
+        },
       });
 
       expect(dbProduct).not.toBeNull();
@@ -210,6 +218,7 @@ describe('Product API 통합 테스트', () => {
       expect(dbProduct.description).toBe(createProduct.description);
       expect(dbProduct.price).toBe(createProduct.price);
       expect(dbProduct.tags).toEqual(expect.arrayContaining(createProduct.tags));
+      expect(dbProduct.productImages[0].key).toBe(createProduct.imageKeys[0]);
     });
 
     it('내용이 없으면 상품 생성에 실패해야 합니다 (400 Bad Request)', async () => {

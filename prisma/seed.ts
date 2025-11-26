@@ -30,7 +30,7 @@ async function main() {
           create: [
             {
               fileUrl: 'uploads/products/1678886400000-product1.png',
-              publicId: 'product1_public_id',
+              key: 'product1_public_id',
             },
           ],
         },
@@ -45,7 +45,7 @@ async function main() {
           create: [
             {
               fileUrl: 'uploads/products/1678886400001-product2.png',
-              publicId: 'product2_public_id',
+              key: 'product2_public_id',
             },
           ],
         },
@@ -74,7 +74,7 @@ async function main() {
           create: [
             {
               fileUrl: 'uploads/articles/1678886400000-article1.png',
-              publicId: 'article1_public_id',
+              key: 'article1_public_id',
             },
           ],
         },
@@ -87,7 +87,7 @@ async function main() {
           create: [
             {
               fileUrl: 'uploads/articles/1678886400001-article2.png',
-              publicId: 'article2_public_id',
+              key: 'article2_public_id',
             },
           ],
         },

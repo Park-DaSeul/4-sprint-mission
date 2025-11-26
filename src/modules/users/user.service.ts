@@ -3,6 +3,7 @@ import type { Prisma, User } from '@prisma/client';
 import type { UpdateUserBody, DeleteUserBody } from './user.dto.js';
 import { verifyPassword, hashPassword } from '../../common/index.js';
 import { NotFoundError, BadRequestError } from '../../utils/errorClass.js';
+import { getFileUrl, moveFileToPermanent } from '../../lib/s3-service.js';
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -16,20 +17,30 @@ export class UserService {
 
   // 사용자 수정
   public updateUser = async (id: string, data: UpdateUserBody, resource: User) => {
-    const { nickname, password, newPassword, imageId } = data;
+    const { nickname, password, newPassword, imageKey } = data;
+
+    let imageData: { key: string; fileUrl: string } | undefined = undefined;
 
     // 비밀번호 확인
     if (password) {
       await verifyPassword(password, resource.password);
     }
 
+    if (imageKey) {
+      // S3 파일 이동
+      const permanentKey = await moveFileToPermanent(imageKey, 'users');
+      const fileUrl = getFileUrl(permanentKey);
+      imageData = { key: permanentKey, fileUrl };
+    }
+
     // 기존 데이터와 새 데이터 비교
     const updateData: Prisma.UserUpdateInput = {
       ...(nickname !== resource.nickname && { nickname }),
       ...(newPassword && { password: await hashPassword(newPassword) }),
-      ...(imageId && {
+      ...(imageData && {
         userImage: {
-          connect: { id: imageId },
+          disconnect: true,
+          create: imageData,
         },
       }),
     };
